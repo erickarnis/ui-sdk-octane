@@ -1,0 +1,11 @@
+ui-sdk-octane
+Copyright 2026 The ui-sdk-octane authors
+
+This product includes software derived from UI SDK (https://github.com/vercel-labs/ui),
+Copyright 2026 Vercel, Inc., licensed under the Apache License, Version 2.0.
+
+src/primitive.ts and src/render-element.ts are ports of packages/react/src/use-primitive.tsx
+and packages/react/src/render-element.ts from @ui-sdk/react 0.1.0-beta.13, changed to run on
+Octane (https://github.com/octanejs/octane). The header of each file describes the changes.
+
+This project is not affiliated with or endorsed by Vercel or the Octane project.

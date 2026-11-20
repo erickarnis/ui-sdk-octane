@@ -185,8 +185,10 @@ function renderElement(
 }
 
 export {
+  isKey,
   isProps,
   mergeProps,
+  mergeRefs,
   renderElement,
   styleObject,
   type PropValue,

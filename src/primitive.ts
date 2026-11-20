@@ -57,8 +57,10 @@ import {
   type OctaneNode,
 } from "octane"
 import {
+  isKey,
   isProps,
   mergeProps,
+  mergeRefs,
   renderElement,
   styleObject,
   type PropValue,
@@ -146,11 +148,13 @@ type PrimitiveHandle<P extends Primitive> = {
 }
 type Handle = PrimitiveHandle<Primitive>
 
-// A render's options the instance doesn't have yet, the state they make over
-// `base`, the instance's state they were last applied to, and the parts that
-// rendered with them and haven't committed yet.
+// A render's options the instance doesn't have yet, the handles of the
+// instances they read, the state they make over `base`, the instance's state
+// they were last applied to, and the parts that rendered with them and
+// haven't committed yet.
 type Preview = {
   options: Props
+  outers: Outer[] | undefined
   base: object
   state: object | undefined
   pending: Set<object>
@@ -168,17 +172,133 @@ const previews = new WeakMap<object, Preview>()
 let handing: Preview | undefined
 
 // Hands a render's options over as it commits. From here the instance has
-// what the preview showed, so the handle reads the instance again.
-function handOver(handle: Handle, options: Props) {
+// what the preview showed, so the handle reads the instance again. The
+// instances the options read, like a toggle's group, commit after it, since
+// children commit first, so the options read them as the render showed them.
+function handOver(handle: Handle, options: Props, outers?: Outer[]) {
   const preview = previews.get(handle)
   previews.delete(handle)
+  forgetCopies(handle)
   const outer = handing
   handing = preview
   try {
-    handle.instance.setOptions(options)
+    within(outers, () => {
+      handle.instance.setOptions(options)
+    })
   } finally {
     handing = outer
   }
+}
+
+// A handle of an instance another primitive's options read.
+type Outer = Pick<Handle, "instance" | "state">
+
+// Option values that read another instance, by the handle of the render
+// that made them.
+const readers = new WeakMap<object, Outer>()
+
+// Marks `read`, an option that reads `handle`'s instance, like a toggle's
+// `group`. The primitive it's passed to renders and takes its options
+// reading that instance as `handle`'s render shows it, so a group's new
+// value reaches its items in the render that changes it.
+function reading<F extends (...args: never[]) => unknown>(
+  handle: Outer,
+  read: F
+) {
+  readers.set(read, handle)
+  return read
+}
+
+// The handles of the instances `options` read.
+function outersOf(options: Props) {
+  let outers: Outer[] | undefined
+  for (const key in options) {
+    const option = options[key]
+    const outer = isKey(option) ? readers.get(option) : undefined
+    if (outer) (outers ??= []).push(outer)
+  }
+  return outers
+}
+
+// Runs `read` with each instance in `outers` reading as its render shows it.
+function within<T>(outers: Outer[] | undefined, read: () => T) {
+  if (!outers) return read()
+  let run = read
+  for (const outer of outers) {
+    const inner = run
+    run = () => readIn(outer, inner)
+  }
+  return run()
+}
+
+// The copies `extendHandle` made of each previewing handle, which stop
+// previewing with it. Upstream marks the shared preview `handed`; here a
+// handle previews for as long as `previews` has it, so its copies leave too.
+const copies = new WeakMap<object, object[]>()
+
+function forgetCopies(handle: object) {
+  for (const copy of copies.get(handle) ?? []) {
+    previews.delete(copy)
+    forgetCopies(copy)
+  }
+  copies.delete(handle)
+}
+
+// A copy of a handle with `extra` keys, like a context that adds the field
+// around it. A plain spread would freeze `state` and lose the preview, and
+// read `api`, which wakes an asleep instance.
+function extendHandle<H extends Outer, E extends object>(handle: H, extra: E) {
+  const made: object = Object.defineProperties(
+    {},
+    {
+      ...Object.getOwnPropertyDescriptors(handle),
+      ...Object.getOwnPropertyDescriptors(extra),
+      state: { get: () => stateIn(made, handle.instance), enumerable: true },
+    }
+  )
+  const preview = previews.get(handle)
+  if (preview) {
+    previews.set(made, preview)
+    copies.set(handle, [...(copies.get(handle) ?? []), made])
+  }
+  // SAFETY: `made` has every own property of `handle` and of `extra`, copied
+  // by descriptor just above, with `state` still a getter of the same type.
+  return made as H & E
+}
+
+// Whether a slot's element should exist, as the handle's render shows it.
+// For this package's own markup: a custom part renders through `usePart`,
+// which waits for the commit.
+function presentIn<P extends Primitive, S extends SlotName<P>>(
+  handle: PrimitiveHandle<P>,
+  name: S,
+  props?: PropsOf<P, S>
+): boolean
+function presentIn(handle: Handle, name: string, props?: unknown) {
+  const part = handle.instance.part(name, props)
+  return readIn(handle, (showing) =>
+    core.present(part, committedProps(part), showing)
+  )
+}
+
+// Props for a slot's element, as the handle's render shows them, merged with
+// the app's props, whose handlers run first. For this package's own markup.
+function slotIn<P extends Primitive, S extends SlotName<P>>(
+  handle: PrimitiveHandle<P>,
+  name: S,
+  props?: PropsOf<P, S>,
+  user?: Props
+): Props
+function slotIn(
+  handle: Handle,
+  name: string,
+  props?: unknown,
+  user: Props = {}
+) {
+  const part = handle.instance.part(name, props)
+  return readIn(handle, (showing) =>
+    elementProps(part, committedProps(part), user, showing)
+  )
 }
 
 // The state a handle's render shows: its preview until it's handed over, made
@@ -191,7 +311,9 @@ function stateIn(handle: object, instance: PrimitiveInstance) {
   if (!preview) return current
   if (preview.base !== current) {
     preview.base = current
-    preview.state = instance.preview(preview.options)
+    preview.state = within(preview.outers, () =>
+      instance.preview(preview.options)
+    )
   }
   return preview.state ?? current
 }
@@ -201,7 +323,7 @@ function stateIn(handle: object, instance: PrimitiveInstance) {
 // api reads the instance's own. The api reads the parts in `around` with the
 // props this render gives them, like a radio group's new value.
 function readIn<T>(
-  handle: Handle,
+  handle: Outer,
   read: (state: object) => T,
   around?: Record<string, Props>
 ) {
@@ -346,15 +468,19 @@ function useHandle(primitive: Primitive, options: Props): Handle {
   // The state this render's options make, while the instance doesn't have
   // them yet: the parts inside render the new value in the same pass, and
   // the instance takes it when that pass commits.
+  // Options that read another instance, like a toggle's group, read it as
+  // this render shows it too.
   const next = { ...options, id }
+  const outers = outersOf(options)
   const base = instance.get()
-  const state = instance.preview(next)
+  const state = within(outers, () => instance.preview(next))
   // One object for the instance's life, so context consumers never re-render
   // because of it. Parts subscribe to what they render through usePart.
   const stable = useMemo(() => makeHandle(primitive, instance), [instance])
   const handle = state
     ? makeHandle(primitive, instance, {
         options: next,
+        outers,
         base,
         state,
         pending: new Set(),
@@ -363,7 +489,7 @@ function useHandle(primitive: Primitive, options: Props): Handle {
 
   // Keeps callbacks fresh and syncs controlled options.
   useLayoutEffect(() => {
-    handOver(handle, next)
+    handOver(handle, next, outers)
   }, null)
 
   const life = useRef<Life>({ at: "rendered" })
@@ -682,6 +808,45 @@ function scopeOf(primitive: Primitive) {
   return scope
 }
 
+/**
+ * Shares an instance with the parts inside, for a root that renders no
+ * element of its own, like a popover's.
+ */
+function HandleScope({
+  handle,
+  children,
+}: {
+  handle: Handle
+  children?: OctaneNode
+}): OctaneNode {
+  const { context } = scopeOf(handle.primitive)
+  const scope = useMemo((): Scope => ({ handle, around: {} }), [handle])
+  return createElement(context, { value: scope, children })
+}
+
+/** The nearest instance of a primitive, or undefined outside its root, like a toggle's group. */
+function useNearest<P extends Primitive>(
+  primitive: P
+): PrimitiveHandle<P> | undefined
+function useNearest(primitive: Primitive) {
+  return useContext(scopeOf(primitive).context)?.handle
+}
+
+/**
+ * The nearest instance of a primitive, for a part written by hand that calls
+ * its api. Upstream's `useHandle`: here that name is the hook behind
+ * `usePrimitive`, so this one leaves as `useHandle` through `./internal`.
+ */
+function useNearestHandle<P extends Primitive>(primitive: P): PrimitiveHandle<P>
+function useNearestHandle(primitive: Primitive) {
+  const handle = useNearest(primitive)
+  if (!handle)
+    throw new Error(
+      `The ${primitive.name} parts must be used inside their root.`
+    )
+  return handle
+}
+
 const isRenderProp = (value: unknown): value is RenderProp =>
   typeof value === "function" || isValidElement(value)
 
@@ -929,6 +1094,34 @@ function createParts(primitive: Primitive, tags: object) {
     }
   }
   return parts
+}
+
+/** The props of the part of `slot` around the one rendering, like an option's inside its group. */
+function useAround<P extends Primitive>(primitive: P, slot: SlotName<P>) {
+  return useContext(scopeOf(primitive).context)?.around[slot]
+}
+
+// Parts of `slot` share their props with the parts inside them, for a slot a
+// feature adds, which `createParts` doesn't see in the schema.
+function sharesProps(primitive: Primitive, slot: string) {
+  scopeOf(primitive).provides.add(slot)
+}
+
+// What upstream's own component files use and its `primitive` entry leaves
+// out. They leave through `./internal`, which the components here import, so
+// the public entry stays the same as @ui-sdk/react/primitive.
+export {
+  extendHandle,
+  HandleScope,
+  mergeRefs,
+  presentIn,
+  readIn,
+  reading,
+  sharesProps,
+  slotIn,
+  useAround,
+  useNearest,
+  useNearestHandle,
 }
 
 export {

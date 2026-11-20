@@ -1,0 +1,30 @@
+export default async function switchChecks(t) {
+  t.eq("renders a switch, off", (await t.attr("#sw", "role")) + " " + (await t.attr("#sw", "aria-checked")), "switch false")
+  await t.page.click("#sw")
+  t.eq("click turns it on", await t.attr("#sw", "aria-checked"), "true")
+  t.eq("the thumb follows", await t.attr("#sw [data-slot=switch-thumb]", "data-checked"), "")
+  await t.press("Space")
+  t.eq("Space turns it off", await t.attr("#sw", "aria-checked"), "false")
+  await t.press("Enter")
+  t.eq("Enter submits and never toggles", (await t.attr("#sw", "aria-checked")) + " " + (await t.text("#sw-form-sent")), "false (empty)")
+  await t.press("Space")
+  await t.page.click("#sw-form-submit")
+  t.eq("checked, it submits its name", await t.text("#sw-form-sent"), "wifi=on")
+  await t.page.click("#sw-form-reset")
+  await t.settle()
+  t.eq("a form reset returns it to its default", await t.attr("#sw", "aria-checked"), "false")
+
+  t.eq("controlled: starts from the app's value", await t.attr("#csw", "aria-checked"), "true")
+  await t.page.click("#csw")
+  t.eq("controlled: press reaches the app and comes back", (await t.text("#csw-value")) + " " + (await t.attr("#csw", "aria-checked")), "false false")
+  await t.page.click("#csw-outside")
+  t.eq("controlled: a change from outside shows", await t.attr("#csw", "aria-checked"), "true")
+
+  t.eq("in a field: named by the label, described by the description", (await t.attr("#fsw", "aria-labelledby")) + " " + (await t.attr("#fsw", "aria-describedby")), "fsw-label fsw-description")
+  t.eq("in a field: the label points at it", await t.attr("#fsw-label", "for"), "fsw")
+  t.eq("in a field: the input takes the field's name", await t.attr("#field input", "name"), "alerts")
+  await t.page.click("#fsw-label")
+  t.eq("clicking its label toggles it", await t.attr("#fsw", "aria-checked"), "true")
+
+  t.eq("disabled: says so and can't be pressed", (await t.attr("#dsw", "aria-disabled")) + " " + (await t.attr("#dsw", "disabled")), "true ")
+}

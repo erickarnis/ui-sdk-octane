@@ -1,0 +1,26 @@
+export default async function collapsible(t) {
+  t.eq("closed at first", await t.attr("#col-trigger", "aria-expanded"), "false")
+  t.eq("closed panel is not in the page", await t.count("#col-panel"), 0)
+  await t.page.click("#col-trigger")
+  t.eq("click opens", await t.attr("#col-trigger", "aria-expanded"), "true")
+  t.eq("trigger controls the panel", await t.attr("#col-trigger", "aria-controls"), "col-panel")
+  t.eq("panel shows", await t.visible("#col-panel"), true)
+  await t.press("Enter")
+  t.eq("Enter closes", await t.attr("#col-trigger", "aria-expanded"), "false")
+  await t.press("Space")
+  t.eq("Space opens", await t.attr("#col-trigger", "aria-expanded"), "true")
+  t.eq("focus stays on the trigger", await t.active(), "col-trigger")
+
+  t.eq("controlled: kept panel is hidden while closed", await t.attr("#ccol-panel", "hidden"), "")
+  t.eq("children as a function of state", await t.text("#ccol-trigger"), "Show")
+  await t.page.click("#ccol-trigger")
+  t.eq("controlled: press reaches the app", await t.text("#ccol-open"), "true")
+  t.eq("controlled: and shows", await t.text("#ccol-trigger"), "Hide")
+  t.eq("controlled: panel no longer hidden", await t.attr("#ccol-panel", "hidden"), null)
+  await t.page.click("#ccol-outside")
+  t.eq("controlled: change from outside closes", await t.attr("#ccol-trigger", "aria-expanded"), "false")
+
+  await t.page.click("#dcol-trigger", { force: true })
+  t.eq("disabled: stays closed", await t.attr("#dcol-trigger", "aria-expanded"), "false")
+  t.eq("disabled: says so", await t.attr("#dcol-trigger", "aria-disabled"), "true")
+}

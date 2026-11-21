@@ -2,6 +2,7 @@ import type { OctaneNode } from "octane"
 import { AccordionPage } from "./accordion"
 import { CheckboxPage } from "./checkbox"
 import { CollapsiblePage } from "./collapsible"
+import { DialogPage } from "./dialog"
 import { RadioPage } from "./radio"
 import { SwitchPage } from "./switch"
 import { TabsPage } from "./tabs"
@@ -12,6 +13,7 @@ export const pages: Record<string, () => OctaneNode> = {
   accordion: AccordionPage,
   checkbox: CheckboxPage,
   collapsible: CollapsiblePage,
+  dialog: DialogPage,
   radio: RadioPage,
   switch: SwitchPage,
   tabs: TabsPage,

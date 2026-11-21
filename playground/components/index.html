@@ -11,6 +11,8 @@
       [data-highlighted] { background: #def; }
       [data-popup], [role="menu"], [role="listbox"], [role="dialog"], [role="tooltip"] { border: 1px solid #888; background: white; padding: 4px; }
       [data-disabled] { opacity: 0.5; }
+      /* A popover is sized to its content by the browser; a backdrop covers the page. */
+      [data-slot$="backdrop"] { position: fixed; inset: 0; width: auto; height: auto; margin: 0; padding: 0; border: 0; background: rgb(0 0 0 / 0.3); }
     </style>
   </head>
   <body>

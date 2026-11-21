@@ -1,0 +1,21 @@
+export default async function paginationChecks(t) {
+  const shown = () => t.page.locator("#pg-list [data-slot=pagination-item]").evaluateAll((els) => els.slice(2, -2).map((el) => el.textContent).join(" "))
+  t.eq("a named navigation landmark around a list", (await t.page.locator("#pg").evaluate((el) => el.tagName)) + " " + (await t.attr("#pg", "aria-label")) + " " + (await t.page.locator("#pg-list").evaluate((el) => el.tagName)), "NAV Results UL")
+  t.eq("the list's children are a function of the range", await shown(), "1 2 3 4 5 … 10")
+  t.eq("without getHref, pages are buttons; the current one says so", (await t.page.locator("#pg-list button").first().evaluate((el) => el.tagName)) + " " + (await t.attr("#pg-list [aria-current=page]", "data-slot")), "BUTTON pagination-link")
+  t.eq("on the first page, first and previous are aria-disabled and stay focusable", (await t.attr("#pg-first", "aria-disabled")) + " " + (await t.attr("#pg-prev", "aria-disabled")) + " " + (await t.attr("#pg-prev", "disabled")), "true true null")
+  await t.page.click("#pg-next")
+  t.eq("next reaches the app", (await t.text("#pg-value")) + " " + (await t.text("#pg-list [aria-current=page]")), "2 2")
+  await t.page.click("#pg-last")
+  t.eq("last goes to the end, where next is disabled", (await t.text("#pg-value")) + " " + (await t.attr("#pg-next", "aria-disabled")), "10 true")
+  t.eq("the range follows the page", await shown(), "1 … 6 7 8 9 10")
+  await t.page.locator("#pg-list [data-slot=pagination-link]", { hasText: "7" }).click()
+  t.eq("a page link goes to its page", (await t.text("#pg-value")) + " " + (await shown()), "7 1 … 6 7 8 9 10")
+  t.eq("the ellipsis is hidden from screen readers", await t.attr("#pg-list [data-slot=pagination-ellipsis]", "aria-hidden"), "true")
+
+  t.eq("with getHref, pages are links to their pages", (await t.page.locator("#links-1").evaluate((el) => el.tagName)) + " " + (await t.attr("#links-1", "href")), "A #page-1")
+  t.eq("a link's children replace its number; the default page is current", (await t.text("#links-2")) + " " + (await t.attr("#links-2", "aria-current")), "Two page")
+  await t.page.click("#links-3")
+  t.eq("following a link changes the page", (await t.attr("#links-3", "aria-current")) + " " + (await t.page.evaluate(() => location.hash)), "page #page-3")
+  t.eq("previous links to the page before", await t.attr("#links-prev", "href"), "#page-2")
+}

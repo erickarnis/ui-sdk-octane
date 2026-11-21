@@ -1,0 +1,31 @@
+export default async function otpInputChecks(t) {
+  const slots = (root) => t.page.locator(`${root} [data-slot=otp-input-slot]`).evaluateAll((els) => els.map((el) => el.textContent).join(""))
+  // The controlled one's slots, which show * or _.
+  const second = () => t.page.evaluate(() => document.querySelectorAll("[data-slot=otp-input]")[1].textContent)
+  t.eq("one real input, named, over the slots", (await t.count("#page-otp-input form input")) + " " + (await t.attr("#otp", "aria-label")) + " " + (await t.attr("#otp", "maxlength")), "1 Code 6")
+  t.eq("the id goes to the input", await t.page.locator("#otp").evaluate((el) => el.tagName), "INPUT")
+  t.eq("six slots, and a separator hidden from screen readers", (await t.count("#page-otp-input form [data-slot=otp-input-slot]")) + " " + (await t.attr("#otp-sep", "aria-hidden")), "6 true")
+  await t.page.click("#otp")
+  await t.page.keyboard.type("12a34")
+  t.eq("typing fills the slots, and only digits are taken", await slots("form"), "1234")
+  t.eq("the next empty slot is active", await t.page.locator("form [data-slot=otp-input-slot]").nth(4).getAttribute("data-active"), "")
+  await t.press("Backspace")
+  t.eq("Backspace removes the last character", await slots("form"), "123")
+  await t.page.keyboard.type("456")
+  t.eq("complete: says so", await t.attr("form [data-slot=otp-input]", "data-complete"), "")
+  await t.page.click("#otp-form-submit")
+  t.eq("it submits the code under its name", await t.text("#otp-form-sent"), "code=123456")
+  await t.page.click("#otp-form-reset")
+  await t.settle()
+  t.eq("a form reset empties it", await slots("form"), "")
+
+  t.eq("controlled: starts from the app's value, through slot children", await second(), "**__")
+  await t.page.focus("#cotp")
+  await t.press("End")
+  await t.page.keyboard.type("34")
+  t.eq("controlled: typing reaches the app, which hears the commit", await t.text("#cotp-value"), "1234|1234")
+  await t.page.click("#cotp-outside")
+  t.eq("controlled: a value from outside shows", (await t.page.inputValue("#cotp")) + " " + (await second()), "9 *___")
+
+  t.eq("in a field: named by its label, with the field's name", (await t.attr("#fotp", "aria-labelledby")) + " " + (await t.attr("#fotp", "name")), "fotp-label verify")
+}

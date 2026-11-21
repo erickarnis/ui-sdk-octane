@@ -1,0 +1,45 @@
+export default async function fileInputChecks(t) {
+  const hidden = "#fi input[type=file]"
+  const file = (name, size = 10, mimeType = "text/plain") => ({ name, mimeType, buffer: Buffer.alloc(size, 97) })
+  t.eq("a hidden file input with the root's options", (await t.attr(hidden, "name")) + " " + (await t.attr(hidden, "multiple")), "docs ")
+  const chooser = t.page.waitForEvent("filechooser", { timeout: 2000 }).then(() => "opened", () => "none")
+  await t.page.click("#fi-trigger")
+  t.eq("the trigger opens the picker", await chooser, "opened")
+  await t.page.setInputFiles(hidden, [file("a.txt"), file("b.txt"), file("big.txt", 5000)])
+  await t.settle()
+  t.eq("chosen files show in the list, once per file", await t.page.locator("#fi-list .name").evaluateAll((els) => els.map((el) => el.textContent).join(",")), "a.txt,b.txt")
+  t.eq("a file over maxSize is rejected, and the app hears why", await t.text("#fi-rejected"), "big.txt:file-too-large")
+  t.eq("each remove button is named by its file", await t.attrs("#fi-list [data-slot=file-input-item-remove]", "aria-label"), "Remove a.txt,Remove b.txt")
+  await t.page.click("#fi-form-submit")
+  t.eq("the form submits the files under its name", await t.text("#fi-form-sent"), "docs=[object File]&docs=[object File]")
+  await t.page.locator("#fi-list [data-slot=file-input-item-remove]").first().click()
+  t.eq("remove takes its file out", await t.page.locator("#fi-list .name").evaluateAll((els) => els.map((el) => el.textContent).join(",")), "b.txt")
+  await t.page.locator("#fi-list [data-slot=file-input-item]").first().focus()
+  await t.press("Delete")
+  t.eq("Delete on a focused item removes it", await t.count("#fi-list [data-slot=file-input-item]"), 0)
+
+  await t.page.locator("#fi-drop").evaluate((el) => {
+    const data = new DataTransfer()
+    data.items.add(new File(["x"], "dropped.txt", { type: "text/plain" }))
+    el.dispatchEvent(new DragEvent("dragenter", { dataTransfer: data, bubbles: true, cancelable: true }))
+    el.dispatchEvent(new DragEvent("dragover", { dataTransfer: data, bubbles: true, cancelable: true }))
+  })
+  t.eq("dragging over the dropzone says so", await t.attr("#fi-drop", "data-dragging"), "")
+  await t.page.locator("#fi-drop").evaluate((el) => {
+    const data = new DataTransfer()
+    data.items.add(new File(["x"], "dropped.txt", { type: "text/plain" }))
+    el.dispatchEvent(new DragEvent("drop", { dataTransfer: data, bubbles: true, cancelable: true }))
+  })
+  await t.settle()
+  t.eq("a drop adds the file", await t.text("#fi-list .name"), "dropped.txt")
+
+  const outside = t.page.waitForEvent("filechooser", { timeout: 2000 }).then(() => "opened", () => "none")
+  await t.page.click("#outside-trigger")
+  t.eq("a trigger outside connects through the controller", await outside, "opened")
+  await t.page.setInputFiles("#cfi input[type=file]", [file("me.png", 10, "image/png")])
+  await t.settle()
+  t.eq("controlled: the value reaches the app", await t.text("#cfi-value"), "me.png")
+
+  t.eq("in a field: the trigger is named by the label and its own text", await t.attr("#ffi-trigger", "aria-labelledby").then((ids) => ids?.split(" ").includes("ffi-label")), true)
+  t.eq("in a field: the input takes the field's name", await t.page.locator("#ffi-trigger").evaluate((el) => el.closest("[data-slot=file-input]").querySelector("input[type=file]").name), "resume")
+}

@@ -1,0 +1,35 @@
+// Fetches the part of UI SDK's repository the conformance run needs: its
+// Playwright specs and the playground fixtures they open, at the commit that
+// released the @ui-sdk/core version this package is pinned to. Nothing from
+// it is committed here; it lands in `.upstream/`, which Git ignores.
+//
+//   node conformance/upstream.mjs
+import { execFileSync } from "node:child_process"
+import { existsSync, mkdirSync } from "node:fs"
+import { fileURLToPath } from "node:url"
+
+/** "chore: version packages (beta) (#893)", which published 0.1.0-beta.13. */
+export const commit = "f01f1739644ce83a0ba09fafc591d4050a2bbe83"
+export const upstream = fileURLToPath(new URL("../.upstream/", import.meta.url))
+
+const git = (...args) =>
+  execFileSync("git", args, { cwd: upstream, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }).trim()
+
+export function fetchUpstream() {
+  if (!existsSync(upstream + ".git")) {
+    mkdirSync(upstream, { recursive: true })
+    git("init", "-q")
+    git("remote", "add", "origin", "https://github.com/vercel-labs/ui")
+    git("sparse-checkout", "init", "--cone")
+    git("sparse-checkout", "set", "tests", "apps/playground")
+  }
+  if (git("rev-parse", "--verify", "-q", "HEAD^{commit}") !== commit) {
+    git("fetch", "--depth", "1", "--filter=blob:none", "origin", commit)
+    git("checkout", "-q", "FETCH_HEAD")
+  }
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  fetchUpstream()
+  console.log(`UI SDK ${commit.slice(0, 7)} is in .upstream/`)
+}

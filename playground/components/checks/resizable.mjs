@@ -1,0 +1,18 @@
+export default async function resizableChecks(t) {
+  const width = (id) => t.page.locator(id).evaluate((el) => Math.round(el.getBoundingClientRect().width))
+  t.eq("the handle is a focusable vertical separator between the panels", (await t.attr("#rz-handle", "role")) + " " + (await t.attr("#rz-handle", "tabindex")) + " " + (await t.attr("#rz-handle", "aria-orientation")), "separator 0 vertical")
+  t.eq("it says the first panel's size", (await t.attr("#rz-handle", "aria-valuenow")) + " " + (await t.attr("#rz-handle", "aria-controls")), "30 " + (await t.attr("#rz-a", "id")))
+  t.check("the panels take their default sizes", Math.abs((await width("#rz-a")) - 118) <= 4, String(await width("#rz-a")))
+  await t.page.focus("#rz-handle")
+  await t.press("ArrowRight")
+  t.eq("ArrowRight grows the first panel by a step, and the app hears the layout", (await t.attr("#rz-handle", "aria-valuenow")) + " " + (await t.text("#rz-layout")), "31 31,69")
+  await t.press("Home")
+  t.eq("Home shrinks it to its minimum", await t.attr("#rz-handle", "aria-valuenow"), "10")
+  const box = await t.page.locator("#rz-handle").boundingBox()
+  await t.page.mouse.move(box.x + 3, box.y + 50)
+  await t.page.mouse.down()
+  await t.page.mouse.move(box.x + 203, box.y + 50, { steps: 8 })
+  await t.page.mouse.up()
+  await t.settle()
+  t.check("dragging the handle resizes the panels", Number(await t.attr("#rz-handle", "aria-valuenow")) > 50, await t.attr("#rz-handle", "aria-valuenow"))
+}

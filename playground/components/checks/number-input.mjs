@@ -1,0 +1,53 @@
+export default async function numberInputChecks(t) {
+  t.eq("a text input showing the default, with its buttons controlling it", (await t.attr("#ni-in", "type")) + " " + (await t.page.inputValue("#ni-in")) + " " + ((await t.attr("#ni-inc", "aria-controls")) === (await t.attr("#ni-in", "id"))), "text 3 true")
+  t.eq("the group is a group", await t.attr("#ni-group", "role"), "group")
+  await t.page.click("#ni-inc")
+  t.eq("increment steps up", await t.page.inputValue("#ni-in"), "4")
+  await t.page.focus("#ni-in")
+  await t.press("ArrowDown")
+  await t.press("ArrowDown")
+  t.eq("ArrowDown steps down", await t.page.inputValue("#ni-in"), "2")
+  await t.press("End")
+  t.eq("End goes to the maximum, and increment is then disabled", (await t.page.inputValue("#ni-in")) + " " + (await t.attr("#ni-inc", "aria-disabled")), "10 true")
+  await t.page.fill("#ni-in", "7")
+  await t.press("Tab")
+  await t.page.click("#ni-form-submit")
+  t.eq("typed and committed, the hidden input submits the number", await t.text("#ni-form-sent"), "qty=7")
+  await t.page.click("#ni-form-reset")
+  await t.settle()
+  t.eq("a form reset returns the default", await t.page.inputValue("#ni-in"), "3")
+
+  // Headless Chromium can hang or crash a page that locks the pointer while
+  // the machine is busy, so the scrub runs as it does where the browser
+  // refuses the lock.
+  await t.page.evaluate(() => {
+    Element.prototype.requestPointerLock = () => Promise.reject(new Error("refused"))
+  })
+  const box = await t.page.locator("#ni-scrub").boundingBox()
+  await t.page.mouse.move(box.x + 5, box.y + 5)
+  await t.page.mouse.down()
+  await t.page.mouse.move(box.x + 25, box.y + 5, { steps: 5 })
+  await t.page.mouse.move(box.x + 45, box.y + 5, { steps: 5 })
+  await t.page.mouse.up()
+  await t.settle()
+  t.check("dragging the scrub area raises the value", Number(await t.page.inputValue("#ni-in")) > 3, await t.page.inputValue("#ni-in"))
+
+  t.eq("controlled: formatted from the app's value", await t.page.inputValue("#cni-in"), "$5.00")
+  await t.page.focus("#cni-in")
+  await t.press("ArrowUp")
+  t.eq("controlled: a step reaches the app", (await t.text("#cni-value")).split("|")[0] + " " + (await t.page.inputValue("#cni-in")), "5.5 $5.50")
+  await t.press("Tab")
+  t.eq("controlled: leaving commits", (await t.text("#cni-value")).split("|")[1], "5.5")
+  await t.page.click("#cni-outside")
+  t.eq("controlled: a value from outside shows", await t.page.inputValue("#cni-in"), "$12.00")
+  const outside = await t.page.locator("#outside-scrub").boundingBox()
+  await t.page.mouse.move(outside.x + 2, outside.y + 2)
+  await t.page.mouse.down()
+  await t.page.mouse.move(outside.x + 40, outside.y + 2, { steps: 8 })
+  await t.page.mouse.up()
+  await t.settle()
+  t.check("a scrub area outside, through the controller, drives it", Number((await t.text("#cni-value")).split("|")[0]) > 12, await t.text("#cni-value"))
+
+  t.eq("in a field: named and described", (await t.attr("#fni-in", "aria-labelledby")) + " " + (await t.attr("#fni-in", "aria-describedby")), "fni-label fni-description")
+  t.eq("in a field: the hidden input takes the field's name", await t.page.locator("#fni-in").evaluate((el) => el.closest("[data-slot=number-input]").querySelector("input[type=hidden]").name), "age")
+}

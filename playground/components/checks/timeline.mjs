@@ -1,0 +1,21 @@
+export default async function timelineChecks(t) {
+  t.eq("a named list of list items", (await t.attr("#tl", "role")) + " " + (await t.attr("#tl", "aria-label")) + " " + (await t.attrs("#tl [data-slot=timeline-item]", "role")), "list Order listitem,listitem,listitem")
+  const titleId = await t.attr("#tl-shipped [data-slot=timeline-title]", "id")
+  const timeId = await t.attr("#tl-shipped time", "id")
+  t.eq("each event is named by its title, described by its time and description", (await t.attr("#tl-shipped", "aria-labelledby")) + " " + (await t.attr("#tl-shipped", "aria-describedby")).split(" ").includes(timeId), titleId + " true")
+  t.eq("the current event is the current step", await t.attrs("#tl [data-slot=timeline-item]", "aria-current"), ",step,")
+  t.eq("the time is a <time> with its dateTime", await t.page.locator("#tl-shipped time").evaluate((el) => el.tagName + " " + el.dateTime), "TIME 2026-11-03")
+  t.eq("markers and connectors are hidden from assistive technology", await t.attrs("#tl-ordered [data-slot=timeline-marker], #tl-ordered [data-slot=timeline-connector]", "aria-hidden"), "true,true")
+  t.eq("one tab stop, on the current event", await t.attrs("#tl [data-slot=timeline-item]", "tabindex"), "-1,0,-1")
+  await t.page.focus("#tl-ordered")
+  await t.press("ArrowDown")
+  t.eq("ArrowDown moves to the next event", await t.active(), "tl-shipped")
+  await t.press("End")
+  t.eq("End moves to the last", await t.active(), "tl-delivered")
+  await t.press("Tab")
+  t.eq("links inside stay in the tab order", await t.page.evaluate(() => document.activeElement?.closest("[data-slot=timeline-item]")?.id + " " + document.activeElement?.tagName), "tl-delivered A")
+
+  t.eq("feed: a feed of articles with their positions", (await t.attr("#feed", "role")) + " " + (await t.attrs("#feed [data-slot=timeline-item]", "role")) + " " + (await t.attrs("#feed [data-slot=timeline-item]", "aria-posinset")) + " " + (await t.attr("#feed-1", "aria-setsize")), "feed article,article 1,2 2")
+  await t.page.click("#feed-busy")
+  t.eq("feed: busy while loading", await t.attr("#feed", "aria-busy"), "true")
+}

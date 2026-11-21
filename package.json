@@ -1,0 +1,378 @@
+{
+  "name": "ui-sdk-octane",
+  "version": "0.0.1",
+  "description": "An unofficial Octane adapter for UI SDK (@ui-sdk/core): render a primitive's parts as Octane components.",
+  "keywords": [
+    "octane",
+    "ui-sdk",
+    "adapter",
+    "headless",
+    "unstyled",
+    "primitives",
+    "components",
+    "accessibility",
+    "a11y",
+    "aria"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/erickarnis/ui-sdk-octane#readme",
+  "bugs": {
+    "url": "https://github.com/erickarnis/ui-sdk-octane/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erickarnis/ui-sdk-octane.git"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.22.2"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "files": [
+    "src",
+    "!src/**/*.test.*",
+    "vite",
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "exports": {
+    "./primitive": {
+      "types": "./dist/src/primitive.d.ts",
+      "default": "./src/primitive.ts"
+    },
+    "./accordion": {
+      "types": "./dist/src/components/accordion.d.ts",
+      "default": "./src/components/accordion.ts"
+    },
+    "./alert-dialog": {
+      "types": "./dist/src/components/alert-dialog.d.ts",
+      "default": "./src/components/alert-dialog.ts"
+    },
+    "./async-options": {
+      "types": "./dist/src/components/async-options.d.ts",
+      "default": "./src/components/async-options.ts"
+    },
+    "./autocomplete": {
+      "types": "./dist/src/components/autocomplete.d.ts",
+      "default": "./src/components/autocomplete.ts"
+    },
+    "./avatar": {
+      "types": "./dist/src/components/avatar.d.ts",
+      "default": "./src/components/avatar.ts"
+    },
+    "./button": {
+      "types": "./dist/src/components/button.d.ts",
+      "default": "./src/components/button.ts"
+    },
+    "./calendar": {
+      "types": "./dist/src/components/calendar.d.ts",
+      "default": "./src/components/calendar.ts"
+    },
+    "./carousel": {
+      "types": "./dist/src/components/carousel.d.ts",
+      "default": "./src/components/carousel.ts"
+    },
+    "./checkbox": {
+      "types": "./dist/src/components/checkbox.d.ts",
+      "default": "./src/components/checkbox.ts"
+    },
+    "./collapsible": {
+      "types": "./dist/src/components/collapsible.d.ts",
+      "default": "./src/components/collapsible.ts"
+    },
+    "./color": {
+      "types": "./dist/src/components/color.d.ts",
+      "default": "./src/components/color.ts"
+    },
+    "./color-picker": {
+      "types": "./dist/src/components/color-picker.d.ts",
+      "default": "./src/components/color-picker.ts"
+    },
+    "./combobox": {
+      "types": "./dist/src/components/combobox.d.ts",
+      "default": "./src/components/combobox.ts"
+    },
+    "./command": {
+      "types": "./dist/src/components/command.d.ts",
+      "default": "./src/components/command.ts"
+    },
+    "./date": {
+      "types": "./dist/src/components/date.d.ts",
+      "default": "./src/components/date.ts"
+    },
+    "./date-input": {
+      "types": "./dist/src/components/date-input.d.ts",
+      "default": "./src/components/date-input.ts"
+    },
+    "./date-picker": {
+      "types": "./dist/src/components/date-picker.d.ts",
+      "default": "./src/components/date-picker.ts"
+    },
+    "./dialog": {
+      "types": "./dist/src/components/dialog.d.ts",
+      "default": "./src/components/dialog.ts"
+    },
+    "./drawer": {
+      "types": "./dist/src/components/drawer.d.ts",
+      "default": "./src/components/drawer.ts"
+    },
+    "./field": {
+      "types": "./dist/src/components/field.d.ts",
+      "default": "./src/components/field.ts"
+    },
+    "./file-input": {
+      "types": "./dist/src/components/file-input.d.ts",
+      "default": "./src/components/file-input.ts"
+    },
+    "./gesture": {
+      "types": "./dist/src/components/gesture.d.ts",
+      "default": "./src/components/gesture.ts"
+    },
+    "./hover-card": {
+      "types": "./dist/src/components/hover-card.d.ts",
+      "default": "./src/components/hover-card.ts"
+    },
+    "./image": {
+      "types": "./dist/src/components/image.d.ts",
+      "default": "./src/components/image.ts"
+    },
+    "./image-cropper": {
+      "types": "./dist/src/components/image-cropper.d.ts",
+      "default": "./src/components/image-cropper.ts"
+    },
+    "./input": {
+      "types": "./dist/src/components/input.d.ts",
+      "default": "./src/components/input.ts"
+    },
+    "./label": {
+      "types": "./dist/src/components/label.d.ts",
+      "default": "./src/components/label.ts"
+    },
+    "./listbox": {
+      "types": "./dist/src/components/listbox.d.ts",
+      "default": "./src/components/listbox.ts"
+    },
+    "./menu": {
+      "types": "./dist/src/components/menu.d.ts",
+      "default": "./src/components/menu.ts"
+    },
+    "./menubar": {
+      "types": "./dist/src/components/menubar.d.ts",
+      "default": "./src/components/menubar.ts"
+    },
+    "./meter": {
+      "types": "./dist/src/components/meter.d.ts",
+      "default": "./src/components/meter.ts"
+    },
+    "./navigation-menu": {
+      "types": "./dist/src/components/navigation-menu.d.ts",
+      "default": "./src/components/navigation-menu.ts"
+    },
+    "./number": {
+      "types": "./dist/src/components/number.d.ts",
+      "default": "./src/components/number.ts"
+    },
+    "./number-input": {
+      "types": "./dist/src/components/number-input.d.ts",
+      "default": "./src/components/number-input.ts"
+    },
+    "./otp-input": {
+      "types": "./dist/src/components/otp-input.d.ts",
+      "default": "./src/components/otp-input.ts"
+    },
+    "./overlays": {
+      "types": "./dist/src/components/overlays.d.ts",
+      "default": "./src/components/overlays.ts"
+    },
+    "./pagination": {
+      "types": "./dist/src/components/pagination.d.ts",
+      "default": "./src/components/pagination.ts"
+    },
+    "./password-input": {
+      "types": "./dist/src/components/password-input.d.ts",
+      "default": "./src/components/password-input.ts"
+    },
+    "./popover": {
+      "types": "./dist/src/components/popover.d.ts",
+      "default": "./src/components/popover.ts"
+    },
+    "./preferences": {
+      "types": "./dist/src/components/preferences.d.ts",
+      "default": "./src/components/preferences.ts"
+    },
+    "./progress": {
+      "types": "./dist/src/components/progress.d.ts",
+      "default": "./src/components/progress.ts"
+    },
+    "./radio": {
+      "types": "./dist/src/components/radio.d.ts",
+      "default": "./src/components/radio.ts"
+    },
+    "./rating": {
+      "types": "./dist/src/components/rating.d.ts",
+      "default": "./src/components/rating.ts"
+    },
+    "./resizable": {
+      "types": "./dist/src/components/resizable.d.ts",
+      "default": "./src/components/resizable.ts"
+    },
+    "./scroll-area": {
+      "types": "./dist/src/components/scroll-area.d.ts",
+      "default": "./src/components/scroll-area.ts"
+    },
+    "./segmented-control": {
+      "types": "./dist/src/components/segmented-control.d.ts",
+      "default": "./src/components/segmented-control.ts"
+    },
+    "./select": {
+      "types": "./dist/src/components/select.d.ts",
+      "default": "./src/components/select.ts"
+    },
+    "./separator": {
+      "types": "./dist/src/components/separator.d.ts",
+      "default": "./src/components/separator.ts"
+    },
+    "./shortcuts": {
+      "types": "./dist/src/components/shortcuts.d.ts",
+      "default": "./src/components/shortcuts.ts"
+    },
+    "./slider": {
+      "types": "./dist/src/components/slider.d.ts",
+      "default": "./src/components/slider.ts"
+    },
+    "./switch": {
+      "types": "./dist/src/components/switch.d.ts",
+      "default": "./src/components/switch.ts"
+    },
+    "./tabs": {
+      "types": "./dist/src/components/tabs.d.ts",
+      "default": "./src/components/tabs.ts"
+    },
+    "./text-match": {
+      "types": "./dist/src/components/text-match.d.ts",
+      "default": "./src/components/text-match.ts"
+    },
+    "./agent": {
+      "types": "./dist/src/components/agent.d.ts",
+      "default": "./src/components/agent.ts"
+    },
+    "./observe": {
+      "types": "./dist/src/components/observe.d.ts",
+      "default": "./src/components/observe.ts"
+    },
+    "./history": {
+      "types": "./dist/src/components/history.d.ts",
+      "default": "./src/components/history.ts"
+    },
+    "./textarea": {
+      "types": "./dist/src/components/textarea.d.ts",
+      "default": "./src/components/textarea.ts"
+    },
+    "./time-input": {
+      "types": "./dist/src/components/time-input.d.ts",
+      "default": "./src/components/time-input.ts"
+    },
+    "./timeline": {
+      "types": "./dist/src/components/timeline.d.ts",
+      "default": "./src/components/timeline.ts"
+    },
+    "./toast": {
+      "types": "./dist/src/components/toast.d.ts",
+      "default": "./src/components/toast.ts"
+    },
+    "./toggle": {
+      "types": "./dist/src/components/toggle.d.ts",
+      "default": "./src/components/toggle.ts"
+    },
+    "./token-input": {
+      "types": "./dist/src/components/token-input.d.ts",
+      "default": "./src/components/token-input.ts"
+    },
+    "./toolbar": {
+      "types": "./dist/src/components/toolbar.d.ts",
+      "default": "./src/components/toolbar.ts"
+    },
+    "./tooltip": {
+      "types": "./dist/src/components/tooltip.d.ts",
+      "default": "./src/components/tooltip.ts"
+    },
+    "./tree": {
+      "types": "./dist/src/components/tree.d.ts",
+      "default": "./src/components/tree.ts"
+    },
+    "./trigger-menu": {
+      "types": "./dist/src/components/trigger-menu.d.ts",
+      "default": "./src/components/trigger-menu.ts"
+    },
+    "./waterfall": {
+      "types": "./dist/src/components/waterfall.d.ts",
+      "default": "./src/components/waterfall.ts"
+    },
+    "./vite": {
+      "types": "./dist/vite/index.d.ts",
+      "default": "./vite/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "octane": {
+    "vite": {
+      "optimizeDeps": {
+        "exclude": [
+          "@ui-sdk/core"
+        ]
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "dev": "vite --config playground/vite.config.ts",
+    "build:playground": "vite build --config playground/vite.config.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test --config tests/playwright.config.ts --trace off",
+    "test:serve": "TEST_WATCH=1 node tests/servers.mjs",
+    "test:pack": "node fixtures/run.mjs",
+    "check:package": "node fixtures/check-package.mjs",
+    "test:modes": "node tests/modes/run.mjs",
+    "test:components": "node playground/components/run.mjs",
+    "conformance": "node conformance/run.mjs"
+  },
+  "peerDependencies": {
+    "@ui-sdk/core": "0.1.0-beta.13",
+    "octane": ">=0.16.7 <0.24.0",
+    "vite": "^8.0.16"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@axe-core/playwright": "^4.14.0",
+    "@guidepup/virtual-screen-reader": "^0.33.0",
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "@tsrx/oxc": "0.24.0",
+    "@types/node": "22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@ui-sdk/core": "0.1.0-beta.13",
+    "@ui-sdk/react": "0.1.0-beta.13",
+    "octane": "0.23.0",
+    "playwright": "1.63.0",
+    "publint": "0.3.25",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwindcss": "^4.3.5",
+    "typescript": "6.0.3",
+    "vite": "^8.0.16"
+  }
+}

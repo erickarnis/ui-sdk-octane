@@ -1,0 +1,30 @@
+// Ported from @ui-sdk/react's number (Apache-2.0, 0.1.0-beta.13): it re-exports core.
+export {
+  clamp,
+  decimalsOf,
+  formatNumber,
+  formatNumberRange,
+  formatNumberToParts,
+  fractionOf,
+  isPartialNumber,
+  maxOnGrid,
+  numberFormatter,
+  parseNumber,
+  roundTo,
+  scrubTo,
+  stepBy,
+  stepFromKey,
+  stepValue,
+  valueAt,
+  wrap,
+} from "@ui-sdk/core/number"
+export type {
+  NumberFormat,
+  NumberKeyOptions,
+  NumberMove,
+  NumberRange,
+  NumberScale,
+  NumberScrub,
+  NumberSnap,
+  StepRange,
+} from "@ui-sdk/core/number"

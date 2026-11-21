@@ -1,0 +1,10 @@
+node_modules/
+.playground-dist/
+dist/
+*.tgz
+*.log
+.modes-dist/
+.test-dist/
+test-results/
+.upstream/
+.conformance-dist/

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>ui-sdk-octane components</title>
+    <style>
+      body { font: 14px/1.4 system-ui, sans-serif; margin: 16px; }
+      nav a { margin-right: 8px; }
+      section { margin: 12px 0; padding: 8px; border: 1px solid #ddd; }
+      :focus-visible { outline: 2px solid blue; }
+      [data-highlighted] { background: #def; }
+      [data-popup], [role="menu"], [role="listbox"], [role="dialog"], [role="tooltip"] { border: 1px solid #888; background: white; padding: 4px; }
+      [data-disabled] { opacity: 0.5; }
+      /* A popover is sized to its content by the browser; a backdrop covers the page. */
+      [data-slot$="backdrop"] { position: fixed; inset: 0; width: auto; height: auto; margin: 0; padding: 0; border: 0; background: rgb(0 0 0 / 0.3); }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

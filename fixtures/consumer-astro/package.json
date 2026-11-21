@@ -1,0 +1,22 @@
+{
+  "name": "consumer-astro",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@octanejs/astro": "0.0.53",
+    "@ui-sdk/core": "0.1.0-beta.13",
+    "astro": "^7.4.7",
+    "octane": "0.23.0",
+    "ui-sdk-octane": "file:./ui-sdk-octane.tgz"
+  },
+  "devDependencies": {
+    "@tsrx/oxc": "0.24.0",
+    "typescript": "6.0.3"
+  }
+}

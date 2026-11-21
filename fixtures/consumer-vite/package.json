@@ -1,0 +1,21 @@
+{
+  "name": "consumer-vite",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ui-sdk/core": "0.1.0-beta.13",
+    "octane": "0.23.0",
+    "ui-sdk-octane": "file:./ui-sdk-octane.tgz"
+  },
+  "devDependencies": {
+    "@tsrx/oxc": "0.24.0",
+    "typescript": "6.0.3",
+    "vite": "^8.0.16"
+  }
+}

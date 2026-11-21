@@ -1,0 +1,19 @@
+{
+  // Emits the declarations the package's `types` conditions point at. The
+  // runtime entries are the authored files themselves: `src` is compiled by
+  // the consumer's Octane compiler, and `vite` is plain JavaScript for Node.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "allowJs": true,
+    "checkJs": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "types": ["node"]
+  },
+  "include": ["src", "vite"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

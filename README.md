@@ -1,19 +1,16 @@
 # ui-sdk-octane
 
-An unofficial [Octane](https://github.com/octanejs/octane) adapter for [UI SDK](https://github.com/vercel-labs/ui) (`@ui-sdk/core`).
+**[UI SDK](https://github.com/vercel-labs/ui) for [Octane](https://github.com/octanejs/octane).** Every UI SDK component and behavior, rendered by Octane.
 
-UI SDK is a library of interface behaviors: keyboard navigation, focus, selection, dismissal, popups, and the ARIA they need. You describe a component once as a _primitive_, and an adapter renders its parts in your framework. UI SDK ships adapters for React, Vue, Svelte, Solid and Web Components. This is one for Octane, ported from `@ui-sdk/react`.
+UI SDK ships adapters for React, Vue, Svelte, Solid and Web Components. This is one for Octane: a port of `@ui-sdk/react`, with the same components under the same names.
 
-It is not affiliated with or endorsed by Vercel or the Octane project.
+- **All 67 component entries** `@ui-sdk/react` exports, plus `createParts`, `usePrimitive` and `usePart` for components of your own.
+- **Passes UI SDK's own test suite.** 4,958 of upstream's Playwright tests run unchanged against this adapter and pass. The 4 that fail also fail on `@ui-sdk/react`.
+- **Vite and Astro**, on Octane 0.16.7 to 0.23.
 
-> **Status: experimental.** UI SDK is in beta and so is Octane. The adapter builds on `@ui-sdk/core/renderer`, which core keeps for adapters and may change in any release, so each release of this package works with exactly one version of `@ui-sdk/core`. It is not on npm yet.
+> **Unofficial and experimental.** Not affiliated with Vercel or the Octane project. UI SDK and Octane are both in beta, and each release of this package works with exactly one version of `@ui-sdk/core`. It is not on npm yet.
 
-## What you get
-
-- `createParts(primitive, tags)` makes a typed Octane component for every part of a primitive.
-- `usePrimitive` and `usePart` are for parts you write by hand.
-- `mergeProps` and `renderElement` are the helpers the parts themselves use.
-- Every one of UI SDK's ready-made components, each under its own entry with the same names as in `@ui-sdk/react` (`ui-sdk-octane/select`, `/menu`, `/dialog`, `/date-picker` and so on): all 67 entries that package exports.
+## Use
 
 ```tsx
 /** @jsxImportSource octane */
@@ -33,83 +30,55 @@ export function Example() {
 }
 ```
 
-A primitive of your own renders the same way. This one is from UI SDK's docs:
+Every entry is named as in `@ui-sdk/react`: `ui-sdk-octane/select`, `/menu`, `/dialog`, `/date-picker` and so on. A primitive you define with `@ui-sdk/core` becomes components the same way:
 
 ```tsx
-/** @jsxImportSource octane */
-import { definePrimitive } from "@ui-sdk/core"
 import { createParts } from "ui-sdk-octane/primitive"
 
-const muteButton = definePrimitive({
-  name: "mute-button",
-  state: () => ({ muted: false }),
-  api: (context) => ({
-    toggle: () => context.store.set({ muted: !context.store.get().muted }),
-  }),
-  slots: (slot) => ({
-    root: slot({
-      attrs: (state) => ({
-        type: "button",
-        "aria-pressed": String(state.muted),
-      }),
-      press: ({ api }) => api.toggle(),
-    }),
-  }),
-})
-
+// `muteButton` is a primitive made with core's definePrimitive.
 export const { Root: MuteButton } = createParts(muteButton, { root: "button" })
 ```
 
-Every part takes `render` (an element, or a function of the props and the part's state), and `className`, `style` and `children` that may be functions of the part's state. UI SDK's own docs describe primitives, behaviors and parts; what they say about `@ui-sdk/react/primitive` holds here, with the differences below.
+[UI SDK's docs](https://github.com/vercel-labs/ui) cover primitives, behaviors and parts. What they say about `@ui-sdk/react` holds here, with the differences below.
 
 ## Install
 
-See [docs/install.md](docs/install.md) for the commands, the compiler setup for Vite and for Astro, and the version table. In short:
+Until the package is on npm, build a tarball from a checkout (`pnpm pack`) and install that. [docs/install.md](docs/install.md) has the commands and the version table.
 
-- The package ships TypeScript source, and your project's Octane compiler compiles it. With `octane/compiler/vite` that needs no setup. With `@octanejs/astro`, add the `uiSdkOctane()` plugin from `ui-sdk-octane/vite`.
-- Install `@ui-sdk/core` at exactly the version this package names (`0.1.0-beta.13`).
-- Octane `0.16.7` to `0.23.0` are checked.
+- **Vite:** nothing to configure. `octane/compiler/vite` compiles the package's source.
+- **Astro:** add the `uiSdkOctane()` plugin from `ui-sdk-octane/vite`.
+- **`@ui-sdk/core`:** install exactly `0.1.0-beta.13`.
 
 ## Differences from `@ui-sdk/react`
 
-- **Events are the browser's own.** Handlers receive native events, and text input is `onInput`, as everywhere in Octane.
-- **Attributes take either spelling.** `tabindex` and `tabIndex`, `class` and `className` are the same prop to a part.
+- **Events are the browser's own.** Text input is `onInput`, as everywhere in Octane.
+- **Attributes take either spelling:** `tabindex` or `tabIndex`, `class` or `className`.
 - **`style` may be text** as well as an object.
-- **A `render` function is typed for its part's tag.** To render another tag from a function, type its first parameter as props by name, or pass an element:
+- **A `render` function is typed for its part's tag.** To render another tag, pass an element (`render={<a href="#a" />}`) or type the function's first parameter as `Record<string, unknown>`.
+- **Some type parameters are dropped:** the payload type of menu, hover card and drawer content, and the value type of `MenuRadioGroup` and `NavigationMenu`.
 
-  ```tsx
-  <TabsTab value="a" render={<a href="#a" />} />
-  <TabsTab value="a" render={(props: Record<string, unknown>) => <a {...props} href="#a" />} />
-  ```
+## How it is tested
 
-- **Ids differ in spelling.** A part makes one id and derives the rest, where React makes one per id. Relationships between them (`aria-controls`, `aria-labelledby`) are the same.
+| Command | What it runs |
+| --- | --- |
+| `pnpm conformance` | UI SDK's own Playwright specs, fetched at the commit that released the pinned core, against this adapter and against `@ui-sdk/react` as the oracle. Upstream's React fixtures are compiled for Octane as they are. |
+| `pnpm test` | The adapter and `@ui-sdk/react` rendering the same source, driven with the same steps and compared. |
+| `pnpm test:modes` | Server rendering, hydration, `StrictMode`, `<Activity>`, several roots on a page, transitions and Suspense. |
+| `pnpm test:components` | A page of checks for every component. |
+| `pnpm test:pack` | The packed tarball installed into fresh Vite and Astro projects, on the oldest and newest supported Octane. |
 
-## What has been checked
+Each runs against a development and a production build, except conformance, which uses a development build as upstream's own runs do.
 
-Every suite runs against a development build and a production build, because Octane's production compiler memoizes.
+## Limits
 
-- **`pnpm test`**: Playwright tests that render each fixture through this adapter and through `@ui-sdk/react` from the same source, drive both with the same steps, and compare tags, attributes, focus, text and the callbacks the app received. They cover controlled and uncontrolled state, refused changes, roving focus, typeahead, presence, `render`, state functions, `mergeProps`, refs, keyed lists that reorder, and remounting.
-- **`pnpm test:modes`**: server rendering and streaming, hydration, `StrictMode`, `<Activity>`, several roots on one page, transitions and Suspense.
-- **`pnpm test:components`**: every component in a browser, on a page of its own with checks for its roles and ARIA, keyboard, focus, dismissal, and form participation where it has it.
-- **`pnpm test:pack`**: the packed tarball installed into a fresh Vite project and a fresh Astro project, on the oldest and newest supported Octane, using the adapter, a simple component and one that reads its children.
-- **`pnpm typecheck`**: the source and the type tests in `tests/types`.
-
-UI SDK's agent bridge (`@ui-sdk/core/agent`) needs no adapter code and works with parts rendered here.
-
-## Known limits
-
-- **Each component is checked on its own page, not against React.** The side-by-side comparison with `@ui-sdk/react` covers the adapter and a handful of primitives, not all 67 components.
-- **A function as children must be the only child.** `{(state) => …}` beside other children is called with nothing, in Octane as in React. Put everything inside the function.
-- **Some type parameters are dropped.** `Select`, `Combobox`, `SegmentedControl` and `TriggerMenu` are generic over their value. The payload type of menu, hover card and drawer content, and the value type of `MenuRadioGroup` and `NavigationMenu`, are not carried.
-- **Components that read their children** (`Select`, `Combobox`, `Autocomplete`, `Command`, `Menu`, `TriggerMenu`, `TreeItem`) rely on Octane's `descriptorChildren`, which the bundler applies through the import. That is checked for Vite and Astro. In a setup where it does not apply, a closed select cannot learn its label from its items, and a tree item needs `branch` set.
-- **`Preferences` on the server is not verified.** Its inline script and hydration have only run client-side.
-- Hot module replacement of a file that defines a primitive is not verified.
-- Drag and drop between lists, the canvas behaviors, and scrubbing a number input under a real pointer lock have not been exercised.
+- **A function as children must be the only child**, in Octane as in React.
+- **Before Octane 0.23.1, Octane keeps a closed popup's elements alive** when a component's children are first read inside the popup. Menu, combobox and autocomplete work around it. The trigger menu, and your own components built that way, may keep one closed popup in memory.
+- **Not verified:** `Preferences` rendered on a server, hot reload of a file that defines a primitive, drag and drop between lists, and browsers other than Chromium.
 
 ## Contributing
 
-`AGENTS.md` has the rules the code follows and the ways Octane differs from React that matter here. `src/primitive.ts` is kept in the order of upstream's `use-primitive.tsx` so the two read side by side; raising the `@ui-sdk/core` version means re-reading it against that version's React adapter.
+[AGENTS.md](AGENTS.md) has the rules the code follows and the ways Octane differs from React that matter here. `src/primitive.ts` is kept in the order of upstream's `use-primitive.tsx` so the two read side by side.
 
 ## License
 
-Apache-2.0. `src/` is derived from `@ui-sdk/react`, Copyright 2026 Vercel, Inc.; see [NOTICE](NOTICE).
+Apache-2.0. `src/` is derived from `@ui-sdk/react`, Copyright 2026 Vercel, Inc. See [NOTICE](NOTICE).

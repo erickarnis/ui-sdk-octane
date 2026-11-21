@@ -7,6 +7,11 @@
 // Both serve the same fixtures from `.upstream/` and the same published
 // @ui-sdk/core, so a spec that fails only on the Octane build is this
 // adapter's doing.
+//
+// `vite build --ssr` with CONFORMANCE_ADAPTER=octane builds app/server.tsx,
+// the fixtures compiled for the server, which the Octane page's preview server
+// renders for upstream's server-rendering specs (see serverRenderRoute).
+import { execFile } from "node:child_process"
 import { readdirSync, realpathSync } from "node:fs"
 import path from "node:path"
 import { createRequire } from "node:module"
@@ -57,11 +62,16 @@ function reactFixturesAsOctane(): Plugin {
   return {
     name: "conformance:react-fixtures-as-octane",
     enforce: "pre",
-    transform(code, id) {
+    transform(code, id, options) {
       const file = id.split("?", 1)[0] ?? id
       if (!file.startsWith(fixtures) || !/\.tsx?$/.test(file)) return null
       const respelled = code
-        .replace(/from "react-dom\/client"/g, 'from "octane"')
+        // A fixture's mount, which the server never calls, makes a client
+        // root, and octane/server has none.
+        .replace(
+          /from "react-dom\/client"/g,
+          options?.ssr ? `from "${path.join(here, "app/no-client-roots.ts")}"` : 'from "octane"'
+        )
         .replace(/from "react-dom\/server"/g, 'from "octane/server"')
         .replace(/from "react-dom"/g, 'from "octane"')
         .replace(/from "react"/g, 'from "octane"')
@@ -79,6 +89,80 @@ function reactFixturesAsOctane(): Plugin {
         ? `import { Profiler as ConformanceProfiler } from "${path.join(here, "app/profiler.ts")}"\n${respelled.replace(/\bReact\.Profiler\b/g, "ConformanceProfiler")}`
         : respelled
       return { code: `/** @jsxImportSource octane */\n${profiled}`, map: null }
+    },
+  }
+}
+
+// On the Octane page, a `react-ssr.tsx` fixture takes its HTML from the
+// server instead of rendering it in the browser: Octane compiles a module
+// differently for the server and the client, so the client build of a
+// fixture cannot be passed to octane/server's renderToString. The rest of the
+// fixture stays as upstream wrote it, so it records and hydrates the HTML
+// as it does on React.
+function serverRenderedFixtures(): Plugin {
+  const fetched = `import { serverHtml as __conformanceServerHtml } from "${path.join(here, "app/server-html.ts")}"\n`
+  return {
+    name: "conformance:server-rendered-fixtures",
+    enforce: "pre",
+    transform(code, id) {
+      const file = id.split("?", 1)[0] ?? id
+      if (!file.startsWith(fixtures) || !file.endsWith("/react-ssr.tsx")) return null
+      const swapped = code
+        .replace(/^import \{ renderToString \} from "react-dom\/server"\n/m, fetched)
+        .replace(
+          /^function mount\(root: HTMLElement\) \{\n/m,
+          `async function mount(root: HTMLElement) {\n  const __conformanceHtml = await __conformanceServerHtml(${fixtureProps(code, file)})\n`
+        )
+        .replace(/\brenderToString\(app\)/g, "__conformanceHtml")
+      if (/\brenderToString\b/.test(swapped) || !swapped.includes("__conformanceHtml"))
+        throw new Error(`${file} renders on the page in a way this plugin does not know.`)
+      return { code: swapped, map: null }
+    },
+  }
+}
+
+// The props a react-ssr fixture gives its Fixture, as an object expression the
+// page evaluates as the fixture does and sends to the server, which renders
+// the Fixture with them. Two fixtures pass `data`, written `name={expression}`.
+function fixtureProps(code: string, file: string): string {
+  const element = /<Fixture\b([^>]*?)\/>/.exec(code)?.[1] ?? ""
+  const props = [...element.matchAll(/(\w+)=\{([^{}]*)\}/g)]
+  if (element.replace(/(\w+)=\{([^{}]*)\}/g, "").trim())
+    throw new Error(`${file} gives its Fixture props this plugin does not read.`)
+  return `{ ${props.map(([, name, value]) => `${name}: ${value}`).join(", ")} }`
+}
+
+// Answers `/__ssr?fixture=<name>&url=<page url>&props=<JSON>` on the Octane preview server
+// with the fixture rendered by the `vite build --ssr` output, as upstream's
+// playground answers it for Vue and Svelte. See render.mjs for why each
+// render is its own process.
+function serverRenderRoute(): Plugin {
+  const renderer = path.join(here, "render.mjs")
+  return {
+    name: "conformance:server-render-route",
+    configurePreviewServer(server) {
+      server.middlewares.use((request, response, next) => {
+        const url = new URL(request.url ?? "/", "http://localhost")
+        if (url.pathname !== "/__ssr") return next()
+        const fixture = url.searchParams.get("fixture")
+        const page = url.searchParams.get("url")
+        const props = url.searchParams.get("props") ?? "{}"
+        if (!fixture || !page) {
+          response.statusCode = 400
+          response.end("Pass fixture and url.")
+          return
+        }
+        execFile(
+          process.execPath,
+          [renderer, fixture, page, props],
+          { maxBuffer: 64 * 1024 * 1024 },
+          (error, stdout, stderr) => {
+            response.statusCode = error ? 500 : 200
+            response.setHeader("content-type", "text/html")
+            response.end(error ? stderr || error.message : stdout)
+          }
+        )
+      })
     },
   }
 }
@@ -108,12 +192,19 @@ function appAtRoot(): Plugin {
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   root: repo,
   plugins: [
     appAtRoot(),
     coreModules(),
-    ...(adapter === "octane" ? [reactFixturesAsOctane(), octane({ requireDirective: true })] : []),
+    ...(adapter === "octane"
+      ? [
+          ...(isSsrBuild ? [] : [serverRenderedFixtures()]),
+          serverRenderRoute(),
+          reactFixturesAsOctane(),
+          octane({ requireDirective: true }),
+        ]
+      : []),
     tailwind(),
   ],
   resolve: {
@@ -123,11 +214,14 @@ export default defineConfig({
   },
   server: { port: ports[adapter], host: "localhost", strictPort: true },
   preview: { port: ports[adapter], host: "localhost", strictPort: true },
+  // The server build bundles everything it renders, so the fixtures, this
+  // package and core are compiled for the server by Octane's plugin.
+  ssr: { noExternal: true },
   build: {
-    outDir: path.join(repo, ".conformance-dist", adapter),
+    outDir: path.join(repo, ".conformance-dist", isSsrBuild ? `${adapter}-server` : adapter),
     emptyOutDir: true,
-    rollupOptions: { input: path.join(here, "app/index.html") },
+    rollupOptions: { input: path.join(here, isSsrBuild ? "app/server.tsx" : "app/index.html") },
     target: "esnext",
     minify: false,
   },
-})
+}))

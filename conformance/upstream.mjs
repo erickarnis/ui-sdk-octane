@@ -15,6 +15,15 @@ export const upstream = fileURLToPath(new URL("../.upstream/", import.meta.url))
 const git = (...args) =>
   execFileSync("git", args, { cwd: upstream, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }).trim()
 
+/** The checked-out commit, or nothing in a fresh clone, where rev-parse exits 1. */
+function head() {
+  try {
+    return git("rev-parse", "--verify", "-q", "HEAD^{commit}")
+  } catch {
+    return undefined
+  }
+}
+
 export function fetchUpstream() {
   if (!existsSync(upstream + ".git")) {
     mkdirSync(upstream, { recursive: true })
@@ -23,7 +32,7 @@ export function fetchUpstream() {
     git("sparse-checkout", "init", "--cone")
     git("sparse-checkout", "set", "tests", "apps/playground")
   }
-  if (git("rev-parse", "--verify", "-q", "HEAD^{commit}") !== commit) {
+  if (head() !== commit) {
     git("fetch", "--depth", "1", "--filter=blob:none", "origin", commit)
     git("checkout", "-q", "FETCH_HEAD")
   }

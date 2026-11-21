@@ -20,6 +20,10 @@ Read `docs/differences-from-react.md` in the Octane repository before changing h
 - Relative imports name the `.js` file, and an exported function component states its return type (`OctaneNode`), so the published declarations resolve and stay free of React's types.
 - Add `playground/components/<name>.tsx` exporting `<Name>Page`, and `playground/components/checks/<name>.mjs`. `pnpm test:components` drives every page in a development and a production build. A component counts once its checks pass in both.
 
+## Conformance
+
+`pnpm conformance` runs UI SDK's own Playwright specs against this adapter (`conformance/`, with upstream fetched into `.upstream/` at the commit that released the pinned core). A change to `src/` is not done until it passes. A test may be added to `conformance/known.json` only with its reason, found with `pnpm conformance --oracle <spec>`, which runs the same spec on `@ui-sdk/react`.
+
 ## Rules
 
 - Keep `src/primitive.ts` in upstream's order so the two files read side by side. Say in a comment where and why it differs.

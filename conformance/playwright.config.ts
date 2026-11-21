@@ -77,6 +77,14 @@ export default defineConfig<Options>({
       testMatch: portalSpecs,
       testIgnore: [kitchenSinks, countGates, ...specsThatSkip("react")],
     },
+    // Upstream's server-rendering specs, against its react-ssr fixtures. On
+    // the Octane page those take their HTML from the preview server's /__ssr
+    // route (see ../vite.config.ts).
+    {
+      name: `${adapter}-ssr`,
+      use: { baseURL: origins[adapter], framework: "react-ssr" },
+      testIgnore: specsThatSkip("react-ssr"),
+    },
     {
       name: `${adapter}-sheet`,
       use: {

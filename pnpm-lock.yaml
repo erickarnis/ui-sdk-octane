@@ -42,8 +42,8 @@ importers:
         specifier: 0.1.0-beta.13
         version: 0.1.0-beta.13(@types/react@19.3.0)(@ui-sdk/core@0.1.0-beta.13)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       octane:
-        specifier: 0.23.0
-        version: 0.23.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+        specifier: 0.23.1
+        version: 0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
       playwright:
         specifier: 1.63.0
         version: 1.63.0
@@ -1019,8 +1019,8 @@ packages:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
 
-  octane@0.23.0:
-    resolution: {integrity: sha512-9YHsB5mDbWwPOKRjMfhBwKURteRg3A3KgJdnjHGk/hSwSConiD21W6Y9YSI3FDO85sKEkW19wKLHK2eDj8kHRw==}
+  octane@0.23.1:
+    resolution: {integrity: sha512-XstuG9R7WfBGlfY8ubM+8GsmL8fSFi2qXDy9v5WJyVM+7SOsfrSD2LYBMvQXfuMS87O6+kr9wFH48rl9DZP3WA==}
     engines: {node: '>=22.22.2'}
     peerDependencies:
       '@tsrx/oxc': 0.24.0
@@ -2007,7 +2007,7 @@ snapshots:
 
   object-assign@4.1.1: {}
 
-  octane@0.23.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)):
+  octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)):
     dependencies:
       '@tsrx/core': 0.6.9
       '@types/react': 19.3.0

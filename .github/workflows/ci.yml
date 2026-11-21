@@ -54,7 +54,7 @@ jobs:
       fail-fast: false
       matrix:
         # The two ends of the peer range in package.json.
-        octane: ["0.16.7", "0.23.0"]
+        octane: ["0.16.7", "0.23.1"]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -65,6 +65,31 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:pack --octane=${{ matrix.octane }}
+
+  conformance:
+    name: UI SDK's own specs (${{ matrix.project }})
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name != github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        # One job per variant of upstream's suite, so none runs for an hour.
+        project: [octane, octane-data, octane-portal, octane-sheet, octane-ssr]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      # Fails on a test that fails and is not in conformance/known.json.
+      - run: pnpm conformance --projects=${{ matrix.project }}
 
   octane-latest:
     name: Installed from a tarball (newest Octane)

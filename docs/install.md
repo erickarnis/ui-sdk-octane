@@ -121,10 +121,10 @@ not apply to its source. They resolve with `"moduleResolution": "bundler"`,
 
 | ui-sdk-octane | `@ui-sdk/core`           | Octane                            | Node         |
 | ------------- | ------------------------ | --------------------------------- | ------------ |
-| 0.0.1         | `0.1.0-beta.13`, exactly | `>=0.16.7 <0.24.0` (0.16.7–0.23.0) | `>=22.22.2`  |
+| 0.0.1         | `0.1.0-beta.13`, exactly | `>=0.16.7 <0.24.0` (0.16.7–0.23.1) | `>=22.22.2`  |
 
 The newest release of each Octane minor in the range (0.16.7, 0.17.0, 0.18.0,
-0.19.3, 0.20.0, 0.21.0, 0.22.0, 0.23.0) was checked from a packed tarball, in a
+0.19.3, 0.20.0, 0.21.0, 0.22.0, 0.23.0, 0.23.1) was checked from a packed tarball, in a
 Vite project and an Astro project, in development and from a production build
 (`pnpm test:pack`). The Astro project used the `@octanejs/astro` release that
 names that Octane version, with Astro 7 and Vite 8, and mounts the app both in
@@ -176,5 +176,5 @@ names one core version, as an exact peer dependency:
 ```sh
 pnpm check:package   # publint and attw on the packed tarball
 pnpm test:pack       # install the tarball into fixtures/consumer-* and drive a browser
-pnpm test:pack --octane=0.23.0 --consumer=astro --pm=bun --keep
+pnpm test:pack --octane=0.23.1 --consumer=astro --pm=bun --keep
 ```

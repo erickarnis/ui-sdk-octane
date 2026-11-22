@@ -8,7 +8,7 @@ import {
   type WaterfallState,
   type WaterfallTimeState,
 } from "@ui-sdk/core/waterfall"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { readIn } from "../internal.js"
 import {
   createParts,
@@ -86,19 +86,19 @@ function Waterfall({
   )
   const content =
     children ??
-    readIn(waterfall, () => waterfall.api.internal.all()).map((item) =>
-      createElement(
-        WaterfallRow,
-        { key: item.value, value: item.value },
-        createElement(
-          WaterfallRowHeader,
-          null,
-          item.children && createElement(WaterfallIndicator),
-          item.label
-        ),
-        createElement(WaterfallBar)
+    readIn(waterfall, () => waterfall.api.internal.all()).map((item) => {
+      // Read now: JSX reads its children only when Octane renders the element.
+      const { value: row, label: text, children: nested } = item
+      return (
+        <WaterfallRow key={row} value={row}>
+          <WaterfallRowHeader>
+            {nested && <WaterfallIndicator />}
+            {text}
+          </WaterfallRowHeader>
+          <WaterfallBar />
+        </WaterfallRow>
       )
-    )
+    })
   return usePart(waterfall, "root", {}, { ...props, children: content })
 }
 
@@ -119,13 +119,11 @@ function WaterfallAxis({
   children = ticks,
   ...props
 }: PartProps<"div", WaterfallAxisState> & WaterfallAxisProps): OctaneNode {
-  return createElement(parts.Axis, defined({ ...props, children }))
+  return <parts.Axis {...defined({ ...props, children })} />
 }
 
 const ticks = (state: WaterfallAxisState) =>
-  state.ticks.map((tick) =>
-    createElement(WaterfallTick, { key: tick.time, time: tick.time })
-  )
+  state.ticks.map((tick) => <WaterfallTick key={tick.time} time={tick.time} />)
 
 /**
  * One time on the axis, placed by `--waterfall-tick`. Without children, it shows the time.
@@ -134,7 +132,7 @@ function WaterfallTick({
   children = label,
   ...props
 }: Parameters<typeof parts.Tick>[0]): OctaneNode {
-  return createElement(parts.Tick, defined({ ...props, children }))
+  return <parts.Tick {...defined({ ...props, children })} />
 }
 
 const label = (state: WaterfallTimeState) => state.label

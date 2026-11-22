@@ -2,7 +2,8 @@
 // Ported from @ui-sdk/react's autocomplete (Apache-2.0, 0.1.0-beta.13).
 // `Autocomplete` reads its children for an `AutocompleteContent`, so it is
 // marked `descriptorChildren`: Octane then hands it the children written in a
-// template as elements, not as a compiled block.
+// template as elements, not as a compiled block. The rest take theirs as a
+// block, which they only render.
 import {
   autocomplete as autocompletePrimitive,
   type AutocompleteContentProps,
@@ -15,9 +16,7 @@ import {
 } from "@ui-sdk/core/autocomplete"
 import {
   createContext,
-  createElement,
   descriptorChildren,
-  Fragment,
   useContext,
   useMemo,
   useState,
@@ -97,34 +96,23 @@ const Autocomplete = descriptorChildren(function Autocomplete({
     )
     useControllerEntry(options.controller, autocomplete)
     const [headerElement, setHeader] = useState<HTMLElement | null>(null)
-    const header = useMemo(
-      () => [headerElement, setHeader] as const,
-      [headerElement, setHeader]
-    )
+    const header = useMemo(() => [headerElement, setHeader] as const)
     // A data autocomplete renders its list, unless the app placed an
     // AutocompleteContent: in the markup, or inside a component of its own.
     const found = hasChild(children, AutocompleteContent)
     const [placed, place] = usePlacedContent(!!options.items && !found)
     const own = placed || found
-    return createElement(
-      HandleScope,
-      { handle: autocomplete },
-      createElement(
-        ContainerContext,
-        { value: container },
-        createElement(
-          SheetHeaderContext,
-          { value: header },
-          createElement(Placed, { value: place }, children),
-          createElement(
-            Placed,
-            { value: null },
-            options.items && !own
-              ? createElement(AutocompleteContent, {})
-              : null
-          )
-        )
-      )
+    return (
+      <HandleScope handle={autocomplete}>
+        <ContainerContext value={container}>
+          <SheetHeaderContext value={header}>
+            <Placed value={place}>{children}</Placed>
+            <Placed value={null}>
+              {options.items && !own ? <AutocompleteContent /> : null}
+            </Placed>
+          </SheetHeaderContext>
+        </ContainerContext>
+      </HandleScope>
     )
   })
 
@@ -197,17 +185,20 @@ function AutocompleteContent({
   const [, setHeader] = useContext(SheetHeaderContext)
   // Reading the part's state subscribes, so items that arrive after the
   // autocomplete rendered still render the list. `autocomplete.state` doesn't subscribe.
-  const body = (state: AutocompleteContentState) =>
-    createElement(
-      Fragment,
-      null,
-      sheetHeader(autocomplete, setHeader),
+  const body = (state: AutocompleteContentState) => {
+    // Read now: JSX reads a property only when Octane renders the element.
+    const header = sheetHeader(autocomplete, setHeader)
+    const list =
       children !== undefined
         ? contentOf(children, state)
-        : state.items &&
-            autocomplete.state.items &&
-            createElement(AutocompleteList, {})
+        : state.items && autocomplete.state.items && <AutocompleteList />
+    return (
+      <>
+        {header}
+        {list}
+      </>
     )
+  }
   const element = usePart(autocomplete, "content", content, {
     ...props,
     children: body,
@@ -227,8 +218,9 @@ function AutocompleteList({
 }
 
 // From the part's state, so new items re-render the list. Without items it's empty.
-const listItems = (state: AutocompleteContentState) =>
-  createElement(AutocompleteItems, { items: state.items })
+const listItems = ({ items }: AutocompleteContentState) => (
+  <AutocompleteItems items={items} />
+)
 
 /**
  * A suggestion. Choosing it fills the field in with its text.

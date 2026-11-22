@@ -16,12 +16,7 @@ import {
   type DrawerOutletState,
   type DrawerTriggerProps,
 } from "@ui-sdk/core/drawer"
-import {
-  createContext,
-  createElement,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import { HandleScope, useHandle, useNearest } from "../internal.js"
 import {
   createParts,
@@ -76,10 +71,10 @@ type DrawerProps = DrawerOptions & { children?: OctaneNode }
 function Drawer({ children, container, ...options }: DrawerProps): OctaneNode {
   const handle = usePrimitive(drawer, options)
   useControllerEntry(options.controller, handle)
-  return createElement(
-    HandleScope,
-    { handle },
-    createElement(ContainerContext, { value: container }, children)
+  return (
+    <HandleScope handle={handle}>
+      <ContainerContext value={container}>{children}</ContainerContext>
+    </HandleScope>
   )
 }
 
@@ -109,21 +104,21 @@ function DrawerTrigger({ controller, ...props }: TriggerPartProps): OctaneNode {
       render,
       { open: false, disabled: !!disabled }
     )
-  return createElement(
-    TriggerContext,
-    { value: { shortcut } },
-    createElement(
-      Connected,
-      { primitive: drawer, controller, fallback: unconnected },
-      createElement(parts.Trigger, defined(props))
-    )
+  return (
+    <TriggerContext value={{ shortcut }}>
+      <Connected primitive={drawer} controller={controller} fallback={unconnected}>
+        <parts.Trigger {...defined(props)} />
+      </Connected>
+    </TriggerContext>
   )
 }
 
 /**
  * A dim behind the drawer. Its opacity follows the drawer, so give it a color like `bg-black/20`.
  */
-function DrawerBackdrop(props: PartProps<"div", DrawerBackdropState>) {
+function DrawerBackdrop(
+  props: PartProps<"div", DrawerBackdropState>
+): OctaneNode {
   const target = usePopupContainer(useContext(ContainerContext))
   const element = usePart(drawer, "backdrop", {}, props)
   return element && renderPopup(element, target)
@@ -139,7 +134,7 @@ function DrawerContent({
   container,
   render,
   ...props
-}: PartProps<"div", DrawerContentState> & DrawerContentProps) {
+}: PartProps<"div", DrawerContentState> & DrawerContentProps): OctaneNode {
   const handle = useHandle(drawer)
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
   const element = usePart(
@@ -178,10 +173,7 @@ const DrawerClose = parts.Close
 function DrawerShortcut(props: ShortcutPartProps): OctaneNode {
   const trigger = useContext(TriggerContext)
   if (useNearest(drawer))
-    return createElement(ShortcutPart, {
-      ...props,
-      inherited: trigger?.shortcut,
-    })
+    return <ShortcutPart {...props} inherited={trigger?.shortcut} />
   // Inside a trigger whose drawer hasn't mounted yet, there's no shortcut to show.
   if (trigger) return null
   throw new Error("Drawer parts must be used inside <Drawer>.")
@@ -214,14 +206,14 @@ function DrawerOutlet({
   ...props
 }: PartProps<"div", DrawerOutletState> & DrawerOutletProps): OctaneNode {
   const { keyframes: _, render, ...rest } = props
-  return createElement(
-    Connected,
-    {
-      primitive: drawer,
-      controller,
-      fallback: () => renderElement("div", rest, render, { open: false }),
-    },
-    createElement(parts.Outlet, defined(props))
+  return (
+    <Connected
+      primitive={drawer}
+      controller={controller}
+      fallback={() => renderElement("div", rest, render, { open: false })}
+    >
+      <parts.Outlet {...defined(props)} />
+    </Connected>
   )
 }
 

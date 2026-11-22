@@ -9,7 +9,6 @@ import {
 } from "@ui-sdk/core/overlays"
 import { toasterInternals, type Toaster } from "@ui-sdk/core/renderer"
 import {
-  createElement,
   Fragment,
   useEffect,
   useLayoutEffect,
@@ -76,23 +75,21 @@ function OverlayHost({
     overlays.entries,
     () => noEntries
   )
-  useLayoutEffect(() => overlays.attachHost(), [overlays])
+  useLayoutEffect(() => overlays.attachHost())
   return entries.map((entry) => {
     // Keyed on a fragment, as the hosted parts take no element props.
-    if (entry.type === "toaster" && isToasterData(entry.data))
-      return createElement(
-        Fragment,
-        { key: entry.id },
-        createElement(HostedToaster, {
-          toaster: entry.data.toaster,
-          props: toast,
-        })
+    const { id, data } = entry
+    if (entry.type === "toaster" && isToasterData(data))
+      return (
+        <Fragment key={id}>
+          <HostedToaster toaster={data.toaster} props={toast} />
+        </Fragment>
       )
-    if (entry.type === "confirm" && isConfirmEntry(entry.data))
-      return createElement(
-        Fragment,
-        { key: entry.id },
-        createElement(HostedConfirm, { entry: entry.data })
+    if (entry.type === "confirm" && isConfirmEntry(data))
+      return (
+        <Fragment key={id}>
+          <HostedConfirm entry={data} />
+        </Fragment>
       )
     return null
   })
@@ -111,41 +108,36 @@ function HostedToaster({
     () => false
   )
   if (placed) return null
-  return createElement(Region, { ...props, toaster, placed: false })
+  return <Region {...props} toaster={toaster} placed={false} />
 }
 
 function HostedConfirm({ entry }: { entry: ConfirmEntry }) {
   // The alert dialog attached the controller in its layout effect, so it can open now.
   useEffect(() => {
     entry.open()
-  }, [entry])
+  })
   const question: Partial<ConfirmOptions> = entry.payload ?? {}
-  return createElement(
-    AlertDialog,
-    {
-      controller: entry.controller,
-      onOpenChangeComplete: (open: boolean) => {
+  return (
+    <AlertDialog
+      controller={entry.controller}
+      onOpenChangeComplete={(open: boolean) => {
         if (!open) entry.done()
-      },
-    },
-    createElement(
-      AlertDialogContent,
-      null,
-      createElement(AlertDialogTitle, null, question.title),
-      question.description
-        ? createElement(AlertDialogDescription, null, question.description)
-        : null,
-      createElement(
-        "div",
-        null,
-        createElement(AlertDialogClose, null, question.cancelLabel ?? "Cancel"),
-        createElement(
-          AlertDialogClose,
-          { value: "confirm" },
-          question.confirmLabel ?? "Continue"
-        )
-      )
-    )
+      }}
+    >
+      <AlertDialogContent>
+        {/* A question without a title still renders the title, empty. */}
+        <AlertDialogTitle<string | undefined>>{question.title}</AlertDialogTitle>
+        {question.description ? (
+          <AlertDialogDescription>{question.description}</AlertDialogDescription>
+        ) : null}
+        <div>
+          <AlertDialogClose>{question.cancelLabel ?? "Cancel"}</AlertDialogClose>
+          <AlertDialogClose value="confirm">
+            {question.confirmLabel ?? "Continue"}
+          </AlertDialogClose>
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 

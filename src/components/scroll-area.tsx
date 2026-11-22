@@ -6,12 +6,7 @@ import {
   type ScrollAreaScrollbarState,
   type ScrollAreaThumbState,
 } from "@ui-sdk/core/scroll-area"
-import {
-  createContext,
-  createElement,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import { createParts, usePart, type PartProps } from "../primitive.js"
 
 const parts = createParts(scrollArea, {
@@ -50,12 +45,13 @@ function ScrollAreaScrollbar({
   ...props
 }: ScrollAreaScrollbarProps &
   PartProps<"div", ScrollAreaScrollbarState>): OctaneNode {
-  // A context is its own provider in Octane.
-  return createElement(
-    OrientationContext,
-    { value: orientation },
-    usePart(scrollArea, "scrollbar", { id: orientation, orientation }, props)
+  const element = usePart(
+    scrollArea,
+    "scrollbar",
+    { id: orientation, orientation },
+    props
   )
+  return <OrientationContext value={orientation}>{element}</OrientationContext>
 }
 
 /**

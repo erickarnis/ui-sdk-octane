@@ -5,7 +5,7 @@ import {
   type MenubarOptions,
   type MenubarState,
 } from "@ui-sdk/core/menubar"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { usePart, usePrimitive, type PartProps } from "../primitive.js"
 import { MenubarContext } from "./menubar-context.js"
 import { defined } from "./octane.js"
@@ -28,11 +28,9 @@ function Menubar({
     defined({ orientation, loop, disabled, modal, controller, debug })
   )
   // In its own context, so a menu can join a menubar without bundling it.
-  return createElement(
-    MenubarContext,
-    { value: menubar },
-    usePart(menubar, "root", {}, props)
-  )
+  // A hook, so called here: Octane builds JSX children when it renders them.
+  const root = usePart(menubar, "root", {}, props)
+  return <MenubarContext value={menubar}>{root}</MenubarContext>
 }
 
 export { createMenubarController } from "@ui-sdk/core/menubar"

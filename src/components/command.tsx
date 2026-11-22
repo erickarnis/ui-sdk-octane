@@ -2,7 +2,8 @@
 // Ported from @ui-sdk/react's command (Apache-2.0, 0.1.0-beta.13). `Command`
 // reads its children for a `CommandList`, so it is marked
 // `descriptorChildren`: Octane then hands it the children written in a
-// template as elements, not as a compiled block.
+// template as elements, not as a compiled block. The rest take theirs as a
+// block, which they only render.
 import {
   command as commandPrimitive,
   type CommandData,
@@ -19,9 +20,7 @@ import {
 } from "@ui-sdk/core/command"
 import {
   createContext,
-  createElement,
   descriptorChildren,
-  Fragment,
   useContext,
   useId,
   type OctaneNode,
@@ -131,19 +130,19 @@ const Command = descriptorChildren(
     const found = !stateful && hasChild(children, CommandList)
     const [placed, place] = usePlacedContent(!stateful && !!items && !found)
     const own = placed || found
-    const content = (state: CommandState) =>
-      isContentFunction(children)
-        ? createElement(Placed, { value: place }, children(state))
-        : createElement(
-            Fragment,
-            null,
-            createElement(Placed, { value: place }, children),
-            createElement(
-              Placed,
-              { value: null },
-              items && !own ? createElement(CommandList, {}) : null
-            )
-          )
+    const content = (state: CommandState) => {
+      if (isContentFunction(children)) {
+        // Read now: JSX reads a property only when Octane renders the element.
+        const shown = children(state)
+        return <Placed value={place}>{shown}</Placed>
+      }
+      return (
+        <>
+          <Placed value={place}>{children}</Placed>
+          <Placed value={null}>{items && !own ? <CommandList /> : null}</Placed>
+        </>
+      )
+    }
     return usePart(command, "root", {}, { ...props, children: content })
   }
 )
@@ -162,12 +161,12 @@ function CommandList({
 }: PartProps<"div", CommandListState, OctaneNode>): OctaneNode {
   usePlaceContent()
   const command = useCommand()
-  const content = (state: CommandListState) =>
-    children !== undefined
-      ? contentOf(children, state)
-      : command.state.items
-        ? createElement(CommandItems, { items: state.items })
-        : null
+  const content = (state: CommandListState) => {
+    if (children !== undefined) return contentOf(children, state)
+    // Read now: JSX reads a property only when Octane renders the element.
+    const { items } = state
+    return command.state.items ? <CommandItems items={items} /> : null
+  }
   return usePart(command, "list", {}, { ...props, children: content })
 }
 
@@ -275,8 +274,7 @@ function CommandPage({
   children,
 }: CommandPageProps & { children?: OctaneNode }): OctaneNode {
   // Its presence, without an element.
-  const page = () =>
-    createElement(PageContext, { value: value ?? null }, children)
+  const page = () => <PageContext value={value ?? null}>{children}</PageContext>
   return usePart(commandPrimitive, "page", defined({ value }), { render: page })
 }
 
@@ -320,37 +318,42 @@ const CommandStatus = parts.Status
  * Renders data commands. Used by data command lists, and available for custom layouts.
  */
 function CommandItems({ items }: { items: CommandData }): OctaneNode {
-  return createElement(
-    DataContext,
-    { value: true },
-    items.map((entry, index) => {
-      if (typeof entry === "string")
-        return createElement(CommandItem, { key: entry, value: entry }, entry)
-      if ("type" in entry && entry.type === "separator")
-        return createElement(CommandSeparator, { key: `separator-${index}` })
-      if ("type" in entry && entry.type === "group") {
-        return createElement(
-          CommandGroup,
-          { key: `group-${entry.label ?? index}` },
-          entry.label
-            ? createElement(CommandGroupLabel, null, entry.label)
-            : null,
-          createElement(CommandItems, { items: entry.items })
+  return (
+    <DataContext value={true}>
+      {items.map((entry, index) => {
+        if (typeof entry === "string") {
+          return (
+            <CommandItem key={entry} value={entry}>
+              {entry}
+            </CommandItem>
+          )
+        }
+        if ("type" in entry && entry.type === "separator")
+          return <CommandSeparator key={`separator-${index}`} />
+        if ("type" in entry && entry.type === "group") {
+          return (
+            <CommandGroup key={`group-${entry.label ?? index}`}>
+              {entry.label ? <CommandGroupLabel>{entry.label}</CommandGroupLabel> : null}
+              <CommandItems items={entry.items} />
+            </CommandGroup>
+          )
+        }
+        return (
+          <CommandItem
+            key={entry.value}
+            {...defined({
+              value: entry.value,
+              label: entry.label,
+              keywords: entry.keywords,
+              disabled: entry.disabled,
+              shortcut: entry.shortcut,
+            })}
+          >
+            {entry.label}
+          </CommandItem>
         )
-      }
-      return createElement(
-        CommandItem,
-        defined({
-          key: entry.value,
-          value: entry.value,
-          label: entry.label,
-          keywords: entry.keywords,
-          disabled: entry.disabled,
-          shortcut: entry.shortcut,
-        }),
-        entry.label
-      )
-    })
+      })}
+    </DataContext>
   )
 }
 

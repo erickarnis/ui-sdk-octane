@@ -2,7 +2,8 @@
 // Ported from @ui-sdk/react's trigger-menu (Apache-2.0, 0.1.0-beta.13).
 // `TriggerMenu` reads its children for a `TriggerMenuContent`, so it is
 // marked `descriptorChildren`: Octane then hands it the children written in a
-// template as elements, not as a compiled block.
+// template as elements, not as a compiled block. The rest take theirs as a
+// block, which they only render.
 import {
   triggerMenu as triggerMenuPrimitive,
   type TriggerMenuContentProps,
@@ -15,7 +16,6 @@ import {
 } from "@ui-sdk/core/trigger-menu"
 import {
   createContext,
-  createElement,
   descriptorChildren,
   useContext,
   type OctaneNode,
@@ -90,19 +90,13 @@ const TriggerMenu = descriptorChildren(function TriggerMenu<T = string>({
     const found = hasChild(children, TriggerMenuContent)
     const [placed, place] = usePlacedContent(!found)
     const own = placed || found
-    return createElement(
-      HandleScope,
-      { handle: menu },
-      createElement(
-        ContainerContext,
-        { value: container },
-        createElement(Placed, { value: place }, children),
-        createElement(
-          Placed,
-          { value: null },
-          own ? null : createElement(TriggerMenuContent, {})
-        )
-      )
+    return (
+      <HandleScope handle={menu}>
+        <ContainerContext value={container}>
+          <Placed value={place}>{children}</Placed>
+          <Placed value={null}>{own ? null : <TriggerMenuContent />}</Placed>
+        </ContainerContext>
+      </HandleScope>
     )
   })
 
@@ -140,7 +134,7 @@ function TriggerMenuContent({
     anchor,
     keepMounted,
   })
-  const body = children ?? createElement(TriggerMenuList, {})
+  const body = children ?? <TriggerMenuList />
   const element = usePart(triggerMenuPrimitive, "content", content, {
     ...props,
     children: body,
@@ -158,8 +152,9 @@ function TriggerMenuList({
   return usePart(triggerMenuPrimitive, "list", {}, { ...props, children })
 }
 
-const listItems = (state: TriggerMenuContentState) =>
-  createElement(TriggerMenuItems, { items: state.items })
+const listItems = ({ items }: TriggerMenuContentState) => (
+  <TriggerMenuItems items={items} />
+)
 
 /**
  * A suggestion. Choosing it inserts it into the text.
@@ -246,11 +241,7 @@ function TriggerMenuItems({
   items: TriggerMenuData<unknown>
 }): OctaneNode {
   const menu = useTriggerMenu()
-  return createElement(ListItems, {
-    items,
-    parts: listParts,
-    keyOf: menu.api.internal.keyOf,
-  })
+  return <ListItems items={items} parts={listParts} keyOf={menu.api.internal.keyOf} />
 }
 
 const listParts: ListParts = {

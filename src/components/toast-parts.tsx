@@ -70,7 +70,7 @@ type ToastRegionProps = Omit<
  * Shows a toaster's toasts. Place it once, or let `<OverlayHost />` render it.
  */
 function ToastRegion(props: ToastRegionProps): OctaneNode {
-  return createElement(Region, { ...props, placed: true })
+  return <Region {...props} placed />
 }
 
 // The region, placed by the app or rendered by the overlay host.
@@ -103,20 +103,20 @@ function Region({
   })
   const region = usePrimitive(toastRegion, options)
   // Each toast with its parts, which read it from context.
-  const list = (state: ToastRegionState) =>
-    createElement(
-      "ol",
-      slotIn(region, "list"),
-      state.toasts.map((item) =>
-        createElement(
-          ToastContext,
-          { key: item.toast.id, value: { region, toast: item.toast } },
-          children
-            ? children(item.toast, item)
-            : createElement(DataToast, { toast: item.toast })
-        )
+  const list = (state: ToastRegionState) => {
+    // Built now, as the app's `children` is called now: JSX reads its
+    // children only when Octane renders the element.
+    const toasts = state.toasts.map((item) => {
+      const toast = item.toast
+      const content = children ? children(toast, item) : <DataToast toast={toast} />
+      return (
+        <ToastContext key={toast.id} value={{ region, toast }}>
+          {content}
+        </ToastContext>
       )
-    )
+    })
+    return <ol {...slotIn(region, "list")}>{toasts}</ol>
+  }
   const element = usePart(
     region,
     "region",
@@ -129,23 +129,23 @@ function Region({
 
 // A toast rendered from its data, with the parts.
 function DataToast({ toast }: { toast: ToastData<OctaneNode> }): OctaneNode {
-  return createElement(
-    Toast,
-    null,
-    createElement(
-      "div",
-      null,
-      toast.title != null ? createElement(ToastTitle, null) : null,
-      toast.description != null ? createElement(ToastDescription, null) : null
-    ),
-    toast.action ? createElement(ToastAction, null) : null,
-    toast.cancel
-      ? createElement(
-          ToastClose,
-          defined({ action: toast.cancel.onCancel }),
-          toast.cancel.label
-        )
-      : null
+  return (
+    <Toast>
+      <div>
+        {toast.title != null ? <ToastTitle /> : null}
+        {toast.description != null ? <ToastDescription /> : null}
+      </div>
+      {toast.action ? <ToastAction /> : null}
+      {/* The label is the app's content, of any type, which ToastClose's
+          children don't admit: createElement doesn't check it. */}
+      {toast.cancel
+        ? createElement(
+            ToastClose,
+            defined({ action: toast.cancel.onCancel }),
+            toast.cancel.label
+          )
+        : null}
+    </Toast>
   )
 }
 
@@ -163,9 +163,11 @@ function Toast(props: PartProps<"li", ToastState>): OctaneNode {
 function ToastTitle({ children, ...props }: PartProps<"div">): OctaneNode {
   const { toast } = useToast("ToastTitle")
   const content = children ?? toast.title
-  return content == null
-    ? null
-    : createElement(TextPart, { text: "title", ...props }, content)
+  return content == null ? null : (
+    <TextPart text="title" {...props}>
+      {content}
+    </TextPart>
+  )
 }
 
 /**
@@ -177,16 +179,19 @@ function ToastDescription({
 }: PartProps<"div">): OctaneNode {
   const { toast } = useToast("ToastDescription")
   const content = children ?? toast.description
-  return content == null
-    ? null
-    : createElement(TextPart, { text: "description", ...props }, content)
+  return content == null ? null : (
+    <TextPart text="description" {...props}>
+      {content}
+    </TextPart>
+  )
 }
 
 // A title or description with content to show.
+// Its content is the app's, of any type.
 function TextPart({
   text,
   ...props
-}: PartProps<"div"> & { text: "title" | "description" }) {
+}: PartProps<"div", {}, OctaneNode> & { text: "title" | "description" }) {
   const { region, toast } = useToast("ToastTitle")
   return usePart(region, text, { id: toast.id }, props)
 }
@@ -201,9 +206,7 @@ type ActionPartProps = Omit<PartProps<"button", ToastButtonState>, "onAction"> &
  */
 function ToastAction(props: ActionPartProps): OctaneNode {
   const { toast } = useToast("ToastAction")
-  return toast.action || props.onAction
-    ? createElement(ActionPart, props)
-    : null
+  return toast.action || props.onAction ? <ActionPart {...props} /> : null
 }
 
 function ActionPart({

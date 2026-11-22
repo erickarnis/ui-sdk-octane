@@ -11,7 +11,7 @@ import {
   type CarouselState,
   type CarouselStepState,
 } from "@ui-sdk/core/carousel"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { useNearest } from "../internal.js"
 import {
   createParts,
@@ -118,20 +118,21 @@ function connectedStep(Step: typeof parts.Previous | typeof parts.Next) {
     ...props
   }: StepProps): OctaneNode {
     const { render, ...rest } = props
-    return createElement(
-      Connected,
-      {
-        primitive: carousel,
-        controller,
-        fallback: () =>
+    return (
+      <Connected
+        primitive={carousel}
+        controller={controller}
+        fallback={() =>
           renderElement(
             "button",
             { type: "button", ...rest },
             render,
             unconnected
-          ),
-      },
-      createElement(Step, defined(props))
+          )
+        }
+      >
+        <Step {...defined(props)} />
+      </Connected>
     )
   }
 }
@@ -155,15 +156,16 @@ function CarouselIndicatorGroup({
 }: PartProps<"div", CarouselIndicatorGroupState> &
   CarouselControlProps): OctaneNode {
   const { render, ...rest } = props
-  return createElement(
-    Connected,
-    {
-      primitive: carousel,
-      controller,
-      fallback: () =>
-        renderElement("div", rest, render, { page: 1, pageCount: null }),
-    },
-    createElement(parts.IndicatorGroup, defined(props))
+  return (
+    <Connected
+      primitive={carousel}
+      controller={controller}
+      fallback={() =>
+        renderElement("div", rest, render, { page: 1, pageCount: null })
+      }
+    >
+      <parts.IndicatorGroup {...defined(props)} />
+    </Connected>
   )
 }
 
@@ -185,7 +187,7 @@ function CarouselIndicator(props: IndicatorProps): OctaneNode {
       selected: false,
     })
   }
-  return createElement(parts.Indicator, defined(props))
+  return <parts.Indicator {...defined(props)} />
 }
 
 /**
@@ -201,20 +203,21 @@ function CarouselPlayToggle({
   CarouselControlProps): OctaneNode {
   const { render, ...rest } = props
   const unconnectedState = { playing: false, paused: false }
-  return createElement(
-    Connected,
-    {
-      primitive: carousel,
-      controller,
-      fallback: () =>
+  return (
+    <Connected
+      primitive={carousel}
+      controller={controller}
+      fallback={() =>
         renderElement(
           "button",
           { type: "button", ...rest },
           render,
           unconnectedState
-        ),
-    },
-    createElement(parts.PlayToggle, defined(props))
+        )
+      }
+    >
+      <parts.PlayToggle {...defined(props)} />
+    </Connected>
   )
 }
 

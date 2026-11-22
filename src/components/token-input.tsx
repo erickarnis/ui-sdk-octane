@@ -13,9 +13,7 @@ import {
 import * as core from "@ui-sdk/core/renderer"
 import {
   createContext,
-  createElement,
   createPortal,
-  Fragment,
   trustHTML,
   useContext,
   useLayoutEffect,
@@ -72,17 +70,15 @@ function TokenInput({
     })
   )
   const custom = !!renderToken
-  useLayoutEffect(() => input.api.internal.setCustom(custom), [custom])
-  return createElement(
-    HandleScope,
-    { handle: input },
-    createElement(
-      EditorContext,
-      { value: input.api.editor },
-      children,
-      renderToken ? createElement(Tokens, { input, renderToken }) : null,
-      createElement(FormInput, {})
-    )
+  useLayoutEffect(() => input.api.internal.setCustom(custom))
+  return (
+    <HandleScope handle={input}>
+      <EditorContext value={input.api.editor}>
+        {children}
+        {renderToken ? <Tokens input={input} renderToken={renderToken} /> : null}
+        <FormInput />
+      </EditorContext>
+    </HandleScope>
   )
 }
 
@@ -99,21 +95,23 @@ function Tokens({
   // The hosts are elements the editor holds, so they come from the instance, never a preview.
   return input.api.internal
     .hosts()
-    .map(({ id, token, host }) =>
-      createPortal(
-        createElement(TokenContext, { value: id }, renderToken(token)),
+    .map(({ id, token, host }) => {
+      const content = renderToken(token)
+      return createPortal(
+        <TokenContext value={id}>{content}</TokenContext>,
         host,
         id
       )
-    )
+    })
 }
 
 // The text a form submits, while the field has a name.
 function FormInput(): OctaneNode {
-  const render = ({ value, ...props }: Props) =>
-    props.name
-      ? createElement("textarea", { ...props, defaultValue: value })
-      : createElement(Fragment, null)
+  const render = ({ value, ...props }: Props) => {
+    // Core's values are typed `unknown`, so the props are a `Props` bag.
+    const textarea: Props = { ...props, defaultValue: value }
+    return props.name ? <textarea {...textarea} /> : <></>
+  }
   return usePart(tokenInput, "form-input", {}, { render }, "textarea")
 }
 

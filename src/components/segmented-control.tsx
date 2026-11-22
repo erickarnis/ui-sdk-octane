@@ -8,7 +8,7 @@ import {
   type SegmentedControlOptions,
   type SegmentedControlState,
 } from "@ui-sdk/core/segmented-control"
-import { createElement, useContext, type OctaneNode } from "octane"
+import { useContext, type OctaneNode } from "octane"
 import { controlRender, FieldContext, useJoinField } from "./field-context.js"
 import {
   createParts,
@@ -90,10 +90,7 @@ function SegmentedControlItem({
   ...props
 }: Omit<PartProps<"button", SegmentedControlItemState>, "value" | "onSelect"> &
   SegmentedControlItemProps): OctaneNode {
-  const input = createElement(
-    SegmentedControlInput,
-    defined({ value, disabled })
-  )
+  const input = <SegmentedControlInput {...defined({ value, disabled })} />
   return usePart(
     segmentedControl,
     "item",

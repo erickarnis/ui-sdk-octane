@@ -6,8 +6,12 @@ const fixtures = import.meta.glob<{ default: object }>("../fixtures/*.tsx")
 
 const params = new URLSearchParams(location.search)
 const variant = params.get("variant")
-const file = `../fixtures/${params.get("fixture")}${variant === "baseui" ? ".baseui" : ""}.tsx`
-const load = fixtures[file]
+const name = `../fixtures/${params.get("fixture")}`
+// An Octane-only fixture is `<name>.octane.tsx`.
+const load =
+  variant === "baseui"
+    ? fixtures[`${name}.baseui.tsx`]
+    : (fixtures[`${name}.tsx`] ?? fixtures[`${name}.octane.tsx`])
 if (load) {
   Object.assign(window, { __bench: (await load()).default })
   document.body.dataset.ready = ""

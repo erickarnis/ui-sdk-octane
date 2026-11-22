@@ -6,6 +6,7 @@
 //   pnpm bench --runs=30 --label=after  more runs; write bench/results/after.json
 //   pnpm bench --no-build               reuse the last builds
 //   pnpm bench --profile=select/open    also profile one scenario on Octane
+//   pnpm bench --profile=select/open --profile-only
 //
 // A run's time is the main thread's busy time from the start of the
 // interaction until the page is idle again (Chromium's TaskDuration): script,
@@ -29,6 +30,7 @@ const runs = Number(option("runs", 15))
 const warmup = Number(option("warmup", 3))
 const label = option("label", "latest")
 const profile = option("profile", undefined)
+const profileOnly = args.includes("--profile-only")
 const filters = args.filter((arg) => !arg.startsWith("--"))
 // BENCH_PORT moves the two static servers, so two checkouts can run at once.
 const port = Number(process.env.BENCH_PORT ?? 4496)
@@ -39,6 +41,7 @@ const fixtures = {
   popover: ["react", "octane"],
   select: ["react", "octane"],
   combobox: ["react", "octane"],
+  elements: ["octane"],
 }
 const builds = { react: "react", octane: "octane", baseui: "octane" }
 
@@ -139,7 +142,7 @@ const step = (page, scenario, which) =>
     [scenario, which]
   )
 
-async function once({ page, cdp }, scenario) {
+async function once({ page, cdp }, scenario, around = {}) {
   const { setup, input } = await step(page, scenario, "prepare")
   for (const each of setup) await send(page, each)
   await settle(page)
@@ -147,11 +150,13 @@ async function once({ page, cdp }, scenario) {
   if (input && "click" in input)
     await page.evaluate((selector) => document.querySelector(selector)?.scrollIntoView({ block: "center" }), input.click)
   await page.evaluate(() => window.__bench.counts())
+  await around.start?.()
   const before = await busy(cdp)
   await step(page, scenario, "act")
   if (input) await send(page, input)
   await settle(page)
   const after = await busy(cdp)
+  await around.stop?.()
   const counts = await page.evaluate(() => window.__bench.counts())
   await step(page, scenario, "reset")
   await settle(page)
@@ -187,10 +192,11 @@ const summary = (samples) => {
 
 const results = []
 for (const [fixture, variants] of Object.entries(fixtures)) {
+  if (profileOnly) break
   if (filters.length && !filters.some((filter) => fixture.includes(filter))) continue
   const pages = {}
   for (const variant of variants) pages[variant] = await open(fixture, variant)
-  const names = await pages.react.page.evaluate(() => window.__bench.names)
+  const names = await pages[variants[0]].page.evaluate(() => window.__bench.names)
   for (const scenario of names) {
     const samples = Object.fromEntries(variants.map((variant) => [variant, []]))
     // Variants take turns, so drift in the machine's speed lands on each alike.
@@ -220,33 +226,34 @@ function format({ fixture, scenario, variants }) {
   return `${`${fixture} / ${scenario}`.padEnd(22)} ${cell(variants.react)} ${cell(variants.octane)} ${ratio.padStart(6)}  ${variants.baseui ? cell(variants.baseui) : ""}`
 }
 
-console.log(
-  `\n${"".padEnd(22)} ${"@ui-sdk/react".padEnd(42)} ${"ui-sdk-octane".padEnd(42)} ${"o/r".padStart(6)}  @octanejs/base-ui`
-)
-for (const row of results) console.log(format(row))
-console.log(
-  `\nMedian of ${runs} runs after ${warmup} warm-up runs, [25th–75th percentile], r: part renders, m: DOM mutations.`
-)
-
-mkdirSync(path.join(here, "results"), { recursive: true })
-const out = path.join(here, "results", `${label}.json`)
-writeFileSync(
-  out,
-  JSON.stringify(
-    {
-      label,
-      date: new Date().toISOString(),
-      runs,
-      warmup,
-      chromium: browser.version(),
-      commit: spawnSync("git", ["rev-parse", "--short", "HEAD"], { cwd: repo, encoding: "utf8" }).stdout.trim(),
-      results,
-    },
-    null,
-    2
-  ) + "\n"
-)
-console.log(`Wrote ${path.relative(repo, out)}.`)
+if (!profileOnly) {
+  console.log(
+    `\n${"".padEnd(22)} ${"@ui-sdk/react".padEnd(42)} ${"ui-sdk-octane".padEnd(42)} ${"o/r".padStart(6)}  @octanejs/base-ui`
+  )
+  for (const row of results) console.log(format(row))
+  console.log(
+    `\nMedian of ${runs} runs after ${warmup} warm-up runs, [25th–75th percentile], r: part renders, m: DOM mutations.`
+  )
+  mkdirSync(path.join(here, "results"), { recursive: true })
+  const out = path.join(here, "results", `${label}.json`)
+  writeFileSync(
+    out,
+    JSON.stringify(
+      {
+        label,
+        date: new Date().toISOString(),
+        runs,
+        warmup,
+        chromium: browser.version(),
+        commit: spawnSync("git", ["rev-parse", "--short", "HEAD"], { cwd: repo, encoding: "utf8" }).stdout.trim(),
+        results,
+      },
+      null,
+      2
+    ) + "\n"
+  )
+  console.log(`Wrote ${path.relative(repo, out)}.`)
+}
 
 if (profile) {
   // An unminified build, so the profile names the functions.
@@ -256,21 +263,48 @@ if (profile) {
   for (let run = 0; run < warmup; run++) await once(target, scenario)
   await target.cdp.send("Profiler.enable")
   await target.cdp.send("Profiler.setSamplingInterval", { interval: 100 })
-  await target.cdp.send("Profiler.start")
-  for (let run = 0; run < runs; run++) await once(target, scenario)
-  const { profile: cpu } = await target.cdp.send("Profiler.stop")
+  // Only the timed part of each run is sampled.
   const self = new Map()
-  const byId = new Map(cpu.nodes.map((node) => [node.id, node]))
-  const interval = (cpu.endTime - cpu.startTime) / cpu.samples.length / 1000
-  for (const id of cpu.samples) {
-    const { callFrame } = byId.get(id)
-    if (["(idle)", "(program)", "(root)"].includes(callFrame.functionName)) continue
-    const file = callFrame.url.split("/").pop() ?? ""
-    const key = `${callFrame.functionName || "(anonymous)"}  ${file}:${callFrame.lineNumber + 1}`
-    self.set(key, (self.get(key) ?? 0) + interval)
+  const profiled = {
+    start: () => target.cdp.send("Profiler.start"),
+    async stop() {
+      const { profile: cpu } = await target.cdp.send("Profiler.stop")
+      const byId = new Map(cpu.nodes.map((node) => [node.id, node]))
+      const deltas = cpu.timeDeltas ?? []
+      cpu.samples.forEach((id, index) => {
+        const { callFrame } = byId.get(id)
+        if (["(idle)", "(program)", "(root)"].includes(callFrame.functionName)) return
+        const file = callFrame.url
+          .replace(/^.*?\/assets\//, "")
+          .replace(/^.*node_modules\//, "")
+          .replace(/^.*\/(src|bench)\//, "$1/")
+        const key = `${callFrame.functionName || "(anonymous)"}  ${file}:${callFrame.lineNumber + 1}`
+        self.set(key, (self.get(key) ?? 0) + (deltas[index + 1] ?? deltas[index] ?? 0) / 1000)
+      })
+    },
   }
+  for (let run = 0; run < runs; run++) await once(target, scenario, profiled)
   const total = [...self.values()].reduce((sum, value) => sum + value, 0)
   console.log(`\nSelf time in ${profile} on Octane, ${runs} runs, ${total.toFixed(0)} ms sampled:`)
+  const owners = new Map()
+  for (const [key, ms] of self) {
+    const where = key.split("  ")[1] ?? ""
+    const owner = key.startsWith("(garbage collector)")
+      ? "garbage collection"
+      : where.startsWith("@ui-sdk/core")
+        ? "@ui-sdk/core"
+        : where.startsWith("octane/")
+          ? "octane"
+          : where.startsWith("src/")
+            ? "this adapter (src/)"
+            : where.startsWith(":")
+              ? "the browser (DOM, style, layout)"
+              : "other (fixture, harness)"
+    owners.set(owner, (owners.get(owner) ?? 0) + ms)
+  }
+  for (const [owner, ms] of [...owners].sort((a, b) => b[1] - a[1]))
+    console.log(`${((ms / total) * 100).toFixed(1).padStart(5)}%  ${(ms / runs).toFixed(2).padStart(7)} ms/run  ${owner}`)
+  console.log("")
   for (const [key, ms] of [...self].sort((a, b) => b[1] - a[1]).slice(0, 30))
     console.log(`${((ms / total) * 100).toFixed(1).padStart(5)}%  ${(ms / runs).toFixed(2).padStart(7)} ms/run  ${key}`)
   await target.page.close()

@@ -30,7 +30,7 @@ function reactFixturesAsOctane(): Plugin {
     enforce: "pre",
     transform(code, id) {
       const file = id.split("?", 1)[0] ?? id
-      if (!file.startsWith(fixtures) || !/\.tsx$/.test(file) || file.endsWith(".baseui.tsx"))
+      if (!file.startsWith(fixtures) || !/\.tsx$/.test(file) || /\.(baseui|octane)\.tsx$/.test(file))
         return null
       const respelled = code
         .replace(/from "react-dom\/client"/g, 'from "octane"')
@@ -46,12 +46,13 @@ function reactFixturesAsOctane(): Plugin {
   }
 }
 
-// The Base UI fixtures are Octane modules, which the React build leaves empty.
+// The Base UI and Octane-only fixtures are Octane modules, which the React
+// build leaves empty.
 function withoutOctaneFixtures(): Plugin {
   return {
     name: "bench:without-octane-fixtures",
     enforce: "pre",
-    load: (id) => (id.split("?", 1)[0]?.endsWith(".baseui.tsx") ? "export {}" : null),
+    load: (id) => (/\.(baseui|octane)\.tsx$/.test(id.split("?", 1)[0] ?? "") ? "export {}" : null),
   }
 }
 
@@ -71,7 +72,12 @@ export default defineConfig({
   build: {
     outDir: path.join(repo, ".bench-dist", adapter),
     emptyOutDir: true,
-    rollupOptions: { input: path.join(here, "app/index.html") },
+    rollupOptions: {
+      input: path.join(here, "app/index.html"),
+      // A profile build keeps one file per module, so a profile says whose
+      // code each function is: core's, Octane's or this adapter's.
+      ...(process.env.BENCH_MINIFY === "false" ? { output: { preserveModules: true } } : {}),
+    },
     target: "esnext",
     // `pnpm bench --profile` builds without minifying, so a profile names functions.
     minify: process.env.BENCH_MINIFY !== "false",

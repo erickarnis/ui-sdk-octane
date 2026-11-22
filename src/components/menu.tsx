@@ -32,7 +32,6 @@ import {
 import * as core from "@ui-sdk/core/renderer"
 import {
   createContext,
-  createElement,
   descriptorChildren,
   Fragment,
   useContext,
@@ -136,30 +135,22 @@ const Menu = descriptorChildren(
     const found = hasChild(children, MenuContent)
     const [placed, place] = usePlacedContent(!!items && !found)
     const own = placed || found
-    return createElement(
-      HandleScope,
-      { handle: menu },
-      createElement(
-        ContainerContext,
-        { value: container },
-        // A menu inside this one's content is no item of the menubar.
-        createElement(
-          MenubarContext,
-          { value: null },
-          createElement(Placed, { value: place }, children)
-        ),
-        createElement(
-          Placed,
-          { value: null },
-          items && !own
-            ? createElement(
-                MenuContent,
-                null,
-                createElement(MenuItems, { items })
-              )
-            : null
-        )
-      )
+    return (
+      <HandleScope handle={menu}>
+        <ContainerContext value={container}>
+          {/* A menu inside this one's content is no item of the menubar. */}
+          <MenubarContext value={null}>
+            <Placed value={place}>{children}</Placed>
+          </MenubarContext>
+          <Placed value={null}>
+            {items && !own ? (
+              <MenuContent>
+                <MenuItems items={items} />
+              </MenuContent>
+            ) : null}
+          </Placed>
+        </ContainerContext>
+      </HandleScope>
     )
   }
 )
@@ -172,7 +163,8 @@ type TriggerProps = MenuTriggerProps
 function MenuTrigger({
   controller,
   ...props
-}: Omit<PartProps<"button", MenuTriggerState>, Clashing> & TriggerProps) {
+}: Omit<PartProps<"button", MenuTriggerState>, Clashing> &
+  TriggerProps): OctaneNode {
   const {
     disabled,
     focusableWhenDisabled,
@@ -194,10 +186,10 @@ function MenuTrigger({
       render,
       { open: false, disabled: !!disabled }
     )
-  return createElement(
-    Connected,
-    { primitive: menuPrimitive, controller, fallback: unconnected },
-    createElement(parts.Trigger, defined(props))
+  return (
+    <Connected primitive={menuPrimitive} controller={controller} fallback={unconnected}>
+      <parts.Trigger {...defined(props)} />
+    </Connected>
   )
 }
 
@@ -222,14 +214,15 @@ function ContextTriggerPart({
 function MenuContextTrigger({
   controller,
   ...props
-}: PartProps<"div", MenuContextTriggerState> & MenuContextTriggerProps) {
+}: PartProps<"div", MenuContextTriggerState> &
+  MenuContextTriggerProps): OctaneNode {
   const { disabled, payload: _, render, ...rest } = props
   const unconnected = () =>
     renderElement("div", rest, render, { open: false, disabled: !!disabled })
-  return createElement(
-    Connected,
-    { primitive: menuPrimitive, controller, fallback: unconnected },
-    createElement(ContextTriggerPart, props)
+  return (
+    <Connected primitive={menuPrimitive} controller={controller} fallback={unconnected}>
+      <ContextTriggerPart {...props} />
+    </Connected>
   )
 }
 
@@ -249,7 +242,7 @@ function MenuContent({
   container,
   render,
   ...props
-}: PartProps<"div", MenuContentState> & MenuContentProps) {
+}: PartProps<"div", MenuContentState> & MenuContentProps): OctaneNode {
   usePlaceContent()
   const menu = useMenu()
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
@@ -292,7 +285,8 @@ function MenuItem({
   render,
   children,
   ...props
-}: Omit<PartProps<"div", MenuItemState>, Clashing> & MenuItemProps) {
+}: Omit<PartProps<"div", MenuItemState>, Clashing> &
+  MenuItemProps): OctaneNode {
   const menu = useMenu()
   const id = useId()
   const item = defined({
@@ -305,19 +299,17 @@ function MenuItem({
     destructive,
     onSelect,
   })
-  const content = (state: MenuItemState) =>
-    createElement(
-      Fragment,
-      null,
-      contentOf(children, state),
-      shortcut
-        ? createElement(
-            MenuShortcut,
-            null,
-            formatShortcut(shortcut, menu.state.apple)
-          )
-        : null
+  const content = (state: MenuItemState) => {
+    // Read now: JSX reads a property only when Octane renders the element.
+    const shown = contentOf(children, state)
+    const keys = shortcut ? formatShortcut(shortcut, menu.state.apple) : null
+    return (
+      <>
+        {shown}
+        {shortcut ? <MenuShortcut>{keys}</MenuShortcut> : null}
+      </>
     )
+  }
   return usePart(
     menu,
     "item",
@@ -345,7 +337,7 @@ function MenuCheckboxItem({
   render,
   ...props
 }: Omit<PartProps<"div", MenuCheckboxItemState>, Clashing> &
-  MenuCheckboxItemProps) {
+  MenuCheckboxItemProps): OctaneNode {
   const menu = useMenu()
   menu.instance.use(core.menuCheckable)
   const item = defined({
@@ -357,15 +349,18 @@ function MenuCheckboxItem({
     onCheckedChange,
     closeOnSelect,
   })
-  const indicator = useMemo(
-    () => ({ item: "checkbox-item" as const, itemKey: value }),
-    [value]
+  const indicator = useMemo(() => ({
+    item: "checkbox-item" as const,
+    itemKey: value,
+  }))
+  // A hook, so called here: Octane builds JSX children when it renders them.
+  const element = usePart(
+    menu,
+    "checkbox-item",
+    item,
+    defined({ ...props, render })
   )
-  return createElement(
-    ItemContext,
-    { value: indicator },
-    usePart(menu, "checkbox-item", item, defined({ ...props, render }))
-  )
+  return <ItemContext value={indicator}>{element}</ItemContext>
 }
 
 /**
@@ -379,7 +374,7 @@ function MenuRadioGroup({
   render,
   ...props
 }: Omit<PartProps<"div", MenuRadioGroupState>, Clashing> &
-  MenuRadioGroupProps) {
+  MenuRadioGroupProps): OctaneNode {
   const menu = useMenu()
   menu.instance.use(core.menuCheckable)
   const generated = useId()
@@ -404,7 +399,8 @@ function MenuRadioItem({
   closeOnSelect,
   render,
   ...props
-}: Omit<PartProps<"div", MenuRadioItemState>, Clashing> & MenuRadioItemProps) {
+}: Omit<PartProps<"div", MenuRadioItemState>, Clashing> &
+  MenuRadioItemProps): OctaneNode {
   const menu = useMenu()
   menu.instance.use(core.menuCheckable)
   const group = useRadioGroup()
@@ -415,17 +411,21 @@ function MenuRadioItem({
     disabled,
     closeOnSelect,
   })
-  const indicator = useMemo(
-    () => ({ item: "radio-item" as const, itemKey: value, group: group ?? "" }),
-    [value, group]
-  )
+  const indicator = useMemo(() => ({
+    item: "radio-item" as const,
+    itemKey: value,
+    group: group ?? "",
+  }))
   if (!group)
     throw new Error("<MenuRadioItem> must be used inside <MenuRadioGroup>.")
-  return createElement(
-    ItemContext,
-    { value: indicator },
-    usePart(menu, "radio-item", item, defined({ ...props, render }))
+  // A hook, so called here: Octane builds JSX children when it renders them.
+  const element = usePart(
+    menu,
+    "radio-item",
+    item,
+    defined({ ...props, render })
   )
+  return <ItemContext value={indicator}>{element}</ItemContext>
 }
 
 /**
@@ -435,7 +435,8 @@ function MenuItemIndicator({
   keepMounted,
   render,
   ...props
-}: PartProps<"span", MenuItemIndicatorState> & MenuItemIndicatorProps) {
+}: PartProps<"span", MenuItemIndicatorState> &
+  MenuItemIndicatorProps): OctaneNode {
   const menu = useMenu()
   menu.instance.use(core.menuCheckable)
   const id = useId()
@@ -462,7 +463,7 @@ function MenuItemIcon({
   mirror,
   render,
   ...props
-}: PartProps<"span", MenuItemIconState> & MenuItemIconProps) {
+}: PartProps<"span", MenuItemIconState> & MenuItemIconProps): OctaneNode {
   const menu = useMenu()
   menu.instance.use(core.menuItemIcons)
   const part = defined({ id: useId(), mirror })
@@ -472,20 +473,18 @@ function MenuItemIcon({
 /**
  * A group of items, named by its `MenuGroupLabel`.
  */
-function MenuGroup(props: PartProps<"div">) {
+function MenuGroup(props: PartProps<"div">): OctaneNode {
   const id = useId()
-  // It's named by its label once the label is in the page.
-  return createElement(
-    GroupContext,
-    { value: id },
-    usePart(useMenu(), "group", { id }, props)
-  )
+  // It's named by its label once the label is in the page. Hooks, so called
+  // here: Octane builds JSX children when it renders them.
+  const element = usePart(useMenu(), "group", { id }, props)
+  return <GroupContext value={id}>{element}</GroupContext>
 }
 
 /**
  * The group's heading, which names the group.
  */
-function MenuGroupLabel({ render, ...props }: PartProps<"div">) {
+function MenuGroupLabel({ render, ...props }: PartProps<"div">): OctaneNode {
   const menu = useMenu()
   const radioGroup = useRadioGroup()
   const plainGroup = useContext(GroupContext)
@@ -526,10 +525,10 @@ type MenuSubProps = Pick<
 /**
  * A submenu. Put its `MenuSubTrigger` and `MenuSubContent` inside, in a menu's content.
  */
-function MenuSub({ children, ...options }: MenuSubProps) {
+function MenuSub({ children, ...options }: MenuSubProps): OctaneNode {
   const parent = useMenu()
   const menu = usePrimitive(menuPrimitive, { ...options, parent: parent.api })
-  return createElement(HandleScope, { handle: menu }, children)
+  return <HandleScope handle={menu}>{children}</HandleScope>
 }
 
 /**
@@ -538,7 +537,8 @@ function MenuSub({ children, ...options }: MenuSubProps) {
 function MenuSubTrigger({
   disabled,
   ...props
-}: Omit<PartProps<"div", MenuTriggerState>, Clashing> & MenuSubTriggerProps) {
+}: Omit<PartProps<"div", MenuTriggerState>, Clashing> &
+  MenuSubTriggerProps): OctaneNode {
   return usePart(useMenu(), "trigger", defined({ disabled }), props)
 }
 
@@ -558,81 +558,78 @@ function MenuItems({ items }: { items: MenuData }): OctaneNode {
     switch (item.type) {
       case undefined:
       case "item":
-        return createElement(
-          MenuItem,
-          defined({
-            key: item.value,
-            value: item.value,
-            disabled: item.disabled,
-            shortcut: item.shortcut,
-            closeOnSelect: item.closeOnSelect,
-            destructive: item.destructive,
-          }),
-          item.label
+        return (
+          <MenuItem
+            key={item.value}
+            {...defined({
+              value: item.value,
+              disabled: item.disabled,
+              shortcut: item.shortcut,
+              closeOnSelect: item.closeOnSelect,
+              destructive: item.destructive,
+            })}
+          >
+            {item.label}
+          </MenuItem>
         )
       case "separator":
-        return createElement(MenuSeparator, { key: `separator-${index}` })
+        return <MenuSeparator key={`separator-${index}`} />
       case "group":
-        return createElement(
-          MenuGroup,
-          { key: `group-${index}` },
-          item.label ? createElement(MenuGroupLabel, null, item.label) : null,
-          createElement(MenuItems, { items: item.items })
+        return (
+          <MenuGroup key={`group-${index}`}>
+            {item.label ? <MenuGroupLabel>{item.label}</MenuGroupLabel> : null}
+            <MenuItems items={item.items} />
+          </MenuGroup>
         )
       case "checkbox":
-        return createElement(
-          MenuCheckboxItem,
-          defined({
-            key: item.value,
-            value: item.value,
-            disabled: item.disabled,
-            checked: item.checked,
-            defaultChecked: item.defaultChecked,
-            closeOnSelect: item.closeOnSelect,
-          }),
-          item.label
+        return (
+          <MenuCheckboxItem
+            key={item.value}
+            {...defined({
+              value: item.value,
+              disabled: item.disabled,
+              checked: item.checked,
+              defaultChecked: item.defaultChecked,
+              closeOnSelect: item.closeOnSelect,
+            })}
+          >
+            {item.label}
+          </MenuCheckboxItem>
         )
       case "radio-group":
-        return createElement(
-          MenuRadioGroup,
-          defined({
-            key: item.name,
-            name: item.name,
-            value: item.value,
-            defaultValue: item.defaultValue,
-          }),
-          item.label ? createElement(MenuGroupLabel, null, item.label) : null,
-          item.items.map((radio) =>
-            createElement(
-              MenuRadioItem,
-              defined({
-                key: radio.value,
-                value: radio.value,
-                disabled: radio.disabled,
-              }),
-              radio.label
-            )
-          )
+        return (
+          <MenuRadioGroup
+            key={item.name}
+            {...defined({
+              name: item.name,
+              value: item.value,
+              defaultValue: item.defaultValue,
+            })}
+          >
+            {item.label ? <MenuGroupLabel>{item.label}</MenuGroupLabel> : null}
+            {item.items.map((radio) => (
+              <MenuRadioItem
+                key={radio.value}
+                {...defined({ value: radio.value, disabled: radio.disabled })}
+              >
+                {radio.label}
+              </MenuRadioItem>
+            ))}
+          </MenuRadioGroup>
         )
       case "submenu":
         // Keyed on a fragment: a submenu takes no element props.
-        return createElement(
-          Fragment,
-          { key: `submenu-${index}` },
-          createElement(
-            MenuSub,
-            null,
-            createElement(
-              MenuSubTrigger,
-              defined({ disabled: item.disabled }),
-              item.label
-            ),
-            createElement(
-              MenuSubContent,
-              null,
-              createElement(MenuItems, { items: item.items })
-            )
-          )
+        return (
+          <Fragment key={`submenu-${index}`}>
+            <MenuSub>
+              <MenuSubTrigger {...defined({ disabled: item.disabled })}>
+                {item.label}
+              </MenuSubTrigger>
+              <MenuSubContent>
+                <MenuItems items={item.items} />
+              </MenuSubContent>
+            </MenuSub>
+          </Fragment>
         )
     }
   })

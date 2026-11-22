@@ -1,6 +1,7 @@
+/** @jsxImportSource octane */
 // Ported from @ui-sdk/react's progress (Apache-2.0, 0.1.0-beta.13).
 import { progress, type ProgressValueState } from "@ui-sdk/core/progress"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { createParts, type PartProps } from "../primitive.js"
 import { defined } from "./octane.js"
 
@@ -41,7 +42,7 @@ function ProgressValue({
   children = text,
   ...props
 }: PartProps<"span", ProgressValueState>): OctaneNode {
-  return createElement(parts.Value, defined({ ...props, children }))
+  return <parts.Value {...defined({ ...props, children })} />
 }
 
 export type {

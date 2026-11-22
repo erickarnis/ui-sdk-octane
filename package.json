@@ -57,7 +57,7 @@
     },
     "./autocomplete": {
       "types": "./dist/src/components/autocomplete.d.ts",
-      "default": "./src/components/autocomplete.ts"
+      "default": "./src/components/autocomplete.tsx"
     },
     "./avatar": {
       "types": "./dist/src/components/avatar.d.ts",
@@ -93,11 +93,11 @@
     },
     "./combobox": {
       "types": "./dist/src/components/combobox.d.ts",
-      "default": "./src/components/combobox.ts"
+      "default": "./src/components/combobox.tsx"
     },
     "./command": {
       "types": "./dist/src/components/command.d.ts",
-      "default": "./src/components/command.ts"
+      "default": "./src/components/command.tsx"
     },
     "./date": {
       "types": "./dist/src/components/date.d.ts",
@@ -153,15 +153,15 @@
     },
     "./listbox": {
       "types": "./dist/src/components/listbox.d.ts",
-      "default": "./src/components/listbox.ts"
+      "default": "./src/components/listbox.tsx"
     },
     "./menu": {
       "types": "./dist/src/components/menu.d.ts",
-      "default": "./src/components/menu.ts"
+      "default": "./src/components/menu.tsx"
     },
     "./menubar": {
       "types": "./dist/src/components/menubar.d.ts",
-      "default": "./src/components/menubar.ts"
+      "default": "./src/components/menubar.tsx"
     },
     "./meter": {
       "types": "./dist/src/components/meter.d.ts",
@@ -289,7 +289,7 @@
     },
     "./token-input": {
       "types": "./dist/src/components/token-input.d.ts",
-      "default": "./src/components/token-input.ts"
+      "default": "./src/components/token-input.tsx"
     },
     "./toolbar": {
       "types": "./dist/src/components/toolbar.d.ts",
@@ -301,11 +301,11 @@
     },
     "./tree": {
       "types": "./dist/src/components/tree.d.ts",
-      "default": "./src/components/tree.ts"
+      "default": "./src/components/tree.tsx"
     },
     "./trigger-menu": {
       "types": "./dist/src/components/trigger-menu.d.ts",
-      "default": "./src/components/trigger-menu.ts"
+      "default": "./src/components/trigger-menu.tsx"
     },
     "./waterfall": {
       "types": "./dist/src/components/waterfall.d.ts",

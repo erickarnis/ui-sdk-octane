@@ -45,11 +45,11 @@
     },
     "./accordion": {
       "types": "./dist/src/components/accordion.d.ts",
-      "default": "./src/components/accordion.ts"
+      "default": "./src/components/accordion.tsx"
     },
     "./alert-dialog": {
       "types": "./dist/src/components/alert-dialog.d.ts",
-      "default": "./src/components/alert-dialog.ts"
+      "default": "./src/components/alert-dialog.tsx"
     },
     "./async-options": {
       "types": "./dist/src/components/async-options.d.ts",
@@ -61,11 +61,11 @@
     },
     "./avatar": {
       "types": "./dist/src/components/avatar.d.ts",
-      "default": "./src/components/avatar.ts"
+      "default": "./src/components/avatar.tsx"
     },
     "./button": {
       "types": "./dist/src/components/button.d.ts",
-      "default": "./src/components/button.ts"
+      "default": "./src/components/button.tsx"
     },
     "./calendar": {
       "types": "./dist/src/components/calendar.d.ts",
@@ -73,7 +73,7 @@
     },
     "./carousel": {
       "types": "./dist/src/components/carousel.d.ts",
-      "default": "./src/components/carousel.ts"
+      "default": "./src/components/carousel.tsx"
     },
     "./checkbox": {
       "types": "./dist/src/components/checkbox.d.ts",
@@ -81,7 +81,7 @@
     },
     "./collapsible": {
       "types": "./dist/src/components/collapsible.d.ts",
-      "default": "./src/components/collapsible.ts"
+      "default": "./src/components/collapsible.tsx"
     },
     "./color": {
       "types": "./dist/src/components/color.d.ts",
@@ -113,11 +113,11 @@
     },
     "./dialog": {
       "types": "./dist/src/components/dialog.d.ts",
-      "default": "./src/components/dialog.ts"
+      "default": "./src/components/dialog.tsx"
     },
     "./drawer": {
       "types": "./dist/src/components/drawer.d.ts",
-      "default": "./src/components/drawer.ts"
+      "default": "./src/components/drawer.tsx"
     },
     "./field": {
       "types": "./dist/src/components/field.d.ts",
@@ -133,7 +133,7 @@
     },
     "./hover-card": {
       "types": "./dist/src/components/hover-card.d.ts",
-      "default": "./src/components/hover-card.ts"
+      "default": "./src/components/hover-card.tsx"
     },
     "./image": {
       "types": "./dist/src/components/image.d.ts",
@@ -141,7 +141,7 @@
     },
     "./image-cropper": {
       "types": "./dist/src/components/image-cropper.d.ts",
-      "default": "./src/components/image-cropper.ts"
+      "default": "./src/components/image-cropper.tsx"
     },
     "./input": {
       "types": "./dist/src/components/input.d.ts",
@@ -149,7 +149,7 @@
     },
     "./label": {
       "types": "./dist/src/components/label.d.ts",
-      "default": "./src/components/label.ts"
+      "default": "./src/components/label.tsx"
     },
     "./listbox": {
       "types": "./dist/src/components/listbox.d.ts",
@@ -165,11 +165,11 @@
     },
     "./meter": {
       "types": "./dist/src/components/meter.d.ts",
-      "default": "./src/components/meter.ts"
+      "default": "./src/components/meter.tsx"
     },
     "./navigation-menu": {
       "types": "./dist/src/components/navigation-menu.d.ts",
-      "default": "./src/components/navigation-menu.ts"
+      "default": "./src/components/navigation-menu.tsx"
     },
     "./number": {
       "types": "./dist/src/components/number.d.ts",
@@ -185,11 +185,11 @@
     },
     "./overlays": {
       "types": "./dist/src/components/overlays.d.ts",
-      "default": "./src/components/overlays.ts"
+      "default": "./src/components/overlays.tsx"
     },
     "./pagination": {
       "types": "./dist/src/components/pagination.d.ts",
-      "default": "./src/components/pagination.ts"
+      "default": "./src/components/pagination.tsx"
     },
     "./password-input": {
       "types": "./dist/src/components/password-input.d.ts",
@@ -201,11 +201,11 @@
     },
     "./preferences": {
       "types": "./dist/src/components/preferences.d.ts",
-      "default": "./src/components/preferences.ts"
+      "default": "./src/components/preferences.tsx"
     },
     "./progress": {
       "types": "./dist/src/components/progress.d.ts",
-      "default": "./src/components/progress.ts"
+      "default": "./src/components/progress.tsx"
     },
     "./radio": {
       "types": "./dist/src/components/radio.d.ts",
@@ -217,11 +217,11 @@
     },
     "./resizable": {
       "types": "./dist/src/components/resizable.d.ts",
-      "default": "./src/components/resizable.ts"
+      "default": "./src/components/resizable.tsx"
     },
     "./scroll-area": {
       "types": "./dist/src/components/scroll-area.d.ts",
-      "default": "./src/components/scroll-area.ts"
+      "default": "./src/components/scroll-area.tsx"
     },
     "./segmented-control": {
       "types": "./dist/src/components/segmented-control.d.ts",
@@ -233,7 +233,7 @@
     },
     "./separator": {
       "types": "./dist/src/components/separator.d.ts",
-      "default": "./src/components/separator.ts"
+      "default": "./src/components/separator.tsx"
     },
     "./shortcuts": {
       "types": "./dist/src/components/shortcuts.d.ts",
@@ -277,15 +277,15 @@
     },
     "./timeline": {
       "types": "./dist/src/components/timeline.d.ts",
-      "default": "./src/components/timeline.ts"
+      "default": "./src/components/timeline.tsx"
     },
     "./toast": {
       "types": "./dist/src/components/toast.d.ts",
-      "default": "./src/components/toast.ts"
+      "default": "./src/components/toast.tsx"
     },
     "./toggle": {
       "types": "./dist/src/components/toggle.d.ts",
-      "default": "./src/components/toggle.ts"
+      "default": "./src/components/toggle.tsx"
     },
     "./token-input": {
       "types": "./dist/src/components/token-input.d.ts",
@@ -293,11 +293,11 @@
     },
     "./toolbar": {
       "types": "./dist/src/components/toolbar.d.ts",
-      "default": "./src/components/toolbar.ts"
+      "default": "./src/components/toolbar.tsx"
     },
     "./tooltip": {
       "types": "./dist/src/components/tooltip.d.ts",
-      "default": "./src/components/tooltip.ts"
+      "default": "./src/components/tooltip.tsx"
     },
     "./tree": {
       "types": "./dist/src/components/tree.d.ts",
@@ -309,7 +309,7 @@
     },
     "./waterfall": {
       "types": "./dist/src/components/waterfall.d.ts",
-      "default": "./src/components/waterfall.ts"
+      "default": "./src/components/waterfall.tsx"
     },
     "./vite": {
       "types": "./dist/vite/index.d.ts",

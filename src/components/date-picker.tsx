@@ -15,13 +15,13 @@ import {
 } from "@ui-sdk/core/date-picker"
 import {
   createContext,
-  createElement,
   Fragment,
   useContext,
   useMemo,
   type OctaneNode,
 } from "octane"
-import { extendHandle, slotIn } from "../internal.js"
+import * as internal from "../internal.js"
+import { extendHandle } from "../internal.js"
 import {
   createParts,
   renderElement,
@@ -163,10 +163,7 @@ function DatePicker({
       debug,
     })
   )
-  const context = useMemo(
-    () => extendHandle(picker, { field }),
-    [picker, field]
-  )
+  const context = useMemo(() => extendHandle(picker, { field }))
   // SAFETY: core builds the date picker with the calendar's slots, which is
   // all the Calendar parts inside read through this context.
   const calendar = picker as unknown as CalendarHandle
@@ -176,45 +173,39 @@ function DatePicker({
       ? (startName ?? name ?? field?.name)
       : (name ?? field?.name)
     const submitsEnd = range && (endName ?? name ?? field?.name)
-    return createElement(
-      Fragment,
-      null,
-      children === undefined
-        ? createElement(
-            Fragment,
-            null,
-            createElement(DatePickerInput, {}),
-            range ? createElement(DatePickerInput, { end: true }) : null,
-            createElement(DatePickerTrigger, {}),
-            createElement(DatePickerContent, {})
-          )
-        : contentOf(children, state),
-      submitsStart
-        ? createElement(
-            "input",
-            slotIn(picker, "hidden-input", { id: "start" })
-          )
-        : null,
-      submitsEnd
-        ? createElement(
-            "input",
-            slotIn(picker, "hidden-input", { end: true, id: "end" })
-          )
-        : null
+    // Read now: JSX reads its children only when Octane renders the element.
+    const body =
+      children === undefined ? (
+        <>
+          <DatePickerInput />
+          {range ? <DatePickerInput end /> : null}
+          <DatePickerTrigger />
+          <DatePickerContent />
+        </>
+      ) : (
+        contentOf(children, state)
+      )
+    const start = submitsStart
+      ? internal.slotIn(picker, "hidden-input", { id: "start" })
+      : null
+    const finish = submitsEnd
+      ? internal.slotIn(picker, "hidden-input", { end: true, id: "end" })
+      : null
+    return (
+      <>
+        {body}
+        {start ? <input {...start} /> : null}
+        {finish ? <input {...finish} /> : null}
+      </>
     )
   }
-  return createElement(
-    DatePickerContext,
-    { value: context },
-    createElement(
-      CalendarContext,
-      { value: calendar },
-      createElement(
-        ContainerContext,
-        { value: container },
-        usePart(picker, "root", {}, { ...props, children: content })
-      )
-    )
+  const root = usePart(picker, "root", {}, { ...props, children: content })
+  return (
+    <DatePickerContext value={context}>
+      <CalendarContext value={calendar}>
+        <ContainerContext value={container}>{root}</ContainerContext>
+      </CalendarContext>
+    </DatePickerContext>
   )
 }
 
@@ -256,24 +247,18 @@ function DatePickerInput({
   )
 }
 
-const calendarIcon = createElement(
-  "svg",
-  {
-    width: "16",
-    height: "16",
-    viewBox: "0 0 16 16",
-    fill: "none",
-    stroke: "currentColor",
-    "aria-hidden": "true",
-  },
-  createElement("rect", {
-    x: "2",
-    y: "3",
-    width: "12",
-    height: "11",
-    rx: "1.5",
-  }),
-  createElement("path", { d: "M2 6.5h12M5.5 1.5v3M10.5 1.5v3" })
+const calendarIcon = (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    aria-hidden="true"
+  >
+    <rect x="2" y="3" width="12" height="11" rx="1.5" />
+    <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" />
+  </svg>
 )
 
 /**
@@ -331,23 +316,19 @@ function DatePickerContent({
   const { months } = picker.state
   const body =
     children === undefined
-      ? createElement(
-          Fragment,
-          null,
-          createElement(
-            "div",
-            null,
-            createElement(CalendarPrevious, {}),
-            createElement(CalendarHeading, {}),
-            createElement(CalendarNext, {})
-          ),
-          Array.from({ length: months }, (_, offset) =>
-            createElement(
-              Fragment,
-              { key: offset },
-              createElement(CalendarGrid, { offset })
-            )
-          )
+      ? (
+          <>
+            <div>
+              <CalendarPrevious />
+              <CalendarHeading />
+              <CalendarNext />
+            </div>
+            {Array.from({ length: months }, (_, offset) => (
+              <Fragment key={offset}>
+                <CalendarGrid offset={offset} />
+              </Fragment>
+            ))}
+          </>
         )
       : children
   const element = usePart(picker, "content", content, {

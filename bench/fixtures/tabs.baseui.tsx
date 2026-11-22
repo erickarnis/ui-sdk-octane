@@ -49,7 +49,7 @@ const unmount = () => {
   root = undefined
 }
 
-defineBench({
+export default defineBench({
   mount: { act: mount, reset: unmount },
   "select one": { prepare: mount, input: { click: "[data-target]" }, reset: unmount },
   unmount: { prepare: mount, act: unmount },

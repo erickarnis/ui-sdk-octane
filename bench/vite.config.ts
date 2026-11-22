@@ -73,5 +73,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: { input: path.join(here, "app/index.html") },
     target: "esnext",
+    // `pnpm bench --profile` builds without minifying, so a profile names functions.
+    minify: process.env.BENCH_MINIFY !== "false",
   },
 })

@@ -48,7 +48,7 @@ const unmount = () => {
   root = undefined
 }
 
-defineBench({
+export default defineBench({
   // "Item 1" matches 111 of 1000 items, and "Item 12" 11 of them.
   type: {
     prepare: mount,

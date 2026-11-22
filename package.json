@@ -342,7 +342,8 @@
     "check:package": "node fixtures/check-package.mjs",
     "test:modes": "node tests/modes/run.mjs",
     "test:components": "node playground/components/run.mjs",
-    "conformance": "node conformance/run.mjs"
+    "conformance": "node conformance/run.mjs",
+    "bench": "node bench/run.mjs"
   },
   "peerDependencies": {
     "@ui-sdk/core": "0.1.0-beta.13",

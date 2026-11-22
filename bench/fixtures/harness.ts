@@ -61,8 +61,9 @@ function defineBench(scenarios: Record<string, Scenario>) {
     attributes: true,
     characterData: true,
   })
-  Object.assign(window, {
-    __bench: {
+  // Returned for the page to install: the package's `sideEffects: false`
+  // would let the bundler drop a fixture that only assigned it.
+  return {
       names: Object.keys(scenarios),
       scenario: (name: string) => scenarios[name],
       // The counts since the last call, after the observer's pending records.
@@ -77,8 +78,7 @@ function defineBench(scenarios: Record<string, Scenario>) {
         mutations = 0
         return result
       },
-    },
-  })
+  }
 }
 
 export { counted, defineBench, items, size, type Input, type Scenario }

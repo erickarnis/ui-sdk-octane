@@ -43,7 +43,7 @@ const unmount = () => {
   root = undefined
 }
 
-defineBench({
+export default defineBench({
   mount: { act: mount, reset: unmount },
   "toggle all": { prepare: mount, act: () => flushSync(toggle), reset: unmount },
 })

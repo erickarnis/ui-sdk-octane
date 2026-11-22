@@ -53,7 +53,7 @@ const unmount = () => {
   root = undefined
 }
 
-defineBench({
+export default defineBench({
   mount: { act: mount, reset: unmount },
   open: { prepare: mount, input: { click: ".trigger" }, reset: unmount },
   close: {

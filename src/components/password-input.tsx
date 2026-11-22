@@ -7,7 +7,6 @@ import {
 } from "@ui-sdk/core/password-input"
 import {
   createContext,
-  createElement,
   useContext,
   useMemo,
   type OctaneNode,
@@ -50,25 +49,21 @@ function PasswordInput({
   >): OctaneNode {
   const field = useFieldControl()
   const controlId = useFieldControlId()
-  const control = useMemo(
-    () => ({ field, value, defaultValue }),
-    [field, value, defaultValue]
-  )
+  const control = useMemo(() => ({ field, value, defaultValue }))
   // A context is its own provider in Octane.
-  return createElement(
-    ControlContext,
-    { value: control },
-    createElement(
-      parts.Root,
-      defined({
-        ...props,
-        value,
-        defaultValue,
-        name: name ?? field?.name,
-        disabled: disabled || field?.disabled,
-        controlId,
-      })
-    )
+  return (
+    <ControlContext value={control}>
+      <parts.Root
+        {...defined({
+          ...props,
+          value,
+          defaultValue,
+          name: name ?? field?.name,
+          disabled: disabled || field?.disabled,
+          controlId,
+        })}
+      />
+    </ControlContext>
   )
 }
 

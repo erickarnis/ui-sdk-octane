@@ -10,13 +10,7 @@ import {
   type FileInputTriggerProps,
 } from "@ui-sdk/core/file-input"
 import * as core from "@ui-sdk/core/renderer"
-import {
-  createContext,
-  createElement,
-  Fragment,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import {
   createParts,
   renderElement,
@@ -107,13 +101,16 @@ function FileInput({
     })
   )
   useControllerEntry(controller, handle)
-  const content = (current: FileInputState) =>
-    createElement(
-      Fragment,
-      null,
-      contentOf(children, current),
-      createElement(HiddenInput)
+  const content = (current: FileInputState) => {
+    // Read now: JSX reads its children only when Octane renders the element.
+    const body = contentOf(children, current)
+    return (
+      <>
+        {body}
+        <HiddenInput />
+      </>
     )
+  }
   return usePart(handle, "root", {}, { ...props, children: content })
 }
 
@@ -139,10 +136,10 @@ function FileInputTrigger({
       render,
       unconnectedState
     )
-  return createElement(
-    Connected,
-    { primitive: fileInput, controller, fallback: unconnected },
-    createElement(TriggerPart, defined({ ...props, render }))
+  return (
+    <Connected primitive={fileInput} controller={controller} fallback={unconnected}>
+      <TriggerPart {...defined({ ...props, render })} />
+    </Connected>
   )
 }
 
@@ -155,12 +152,11 @@ const unconnectedState: FileInputState = {
 
 // Inside a Field, the field's attributes for its control.
 function TriggerPart({ render, ...props }: ButtonProps<FileInputState>) {
-  return createElement(
-    parts.Trigger,
-    defined({
-      ...props,
-      render: controlRender(useFieldControl(), "button", render),
-    })
+  const field = useFieldControl()
+  return (
+    <parts.Trigger
+      {...defined({ ...props, render: controlRender(field, "button", render) })}
+    />
   )
 }
 
@@ -182,13 +178,11 @@ function FileInputList({
 }): OctaneNode {
   // A context is its own provider in Octane.
   const items = (state: FileInputState) =>
-    state.value.map((file) =>
-      createElement(
-        FileContext,
-        { key: core.fileKey(file), value: file },
-        children
-      )
-    )
+    state.value.map((file) => (
+      <FileContext key={core.fileKey(file)} value={file}>
+        {children}
+      </FileContext>
+    ))
   return usePart(fileInput, "list", {}, { ...props, children: items })
 }
 
@@ -207,7 +201,7 @@ function FileInputItem({
     { file, value: core.fileKey(file) },
     props
   )
-  return createElement(FileContext, { value: file }, element)
+  return <FileContext value={file}>{element}</FileContext>
 }
 
 /**

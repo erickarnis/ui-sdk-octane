@@ -8,7 +8,7 @@ import {
   type RadioProps,
   type RadioState,
 } from "@ui-sdk/core/radio"
-import { createContext, createElement, useContext } from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import {
   createParts,
   usePart,
@@ -50,7 +50,7 @@ function RadioGroup({
   Omit<
     PartProps<"div", RadioGroupState>,
     "defaultValue" | "onChange" | "onSelect"
-  >) {
+  >): OctaneNode {
   const groupField = useContext(FieldContext)
   const field = useJoinField(groupField)
   const group = usePrimitive(
@@ -69,16 +69,13 @@ function RadioGroup({
       debug,
     })
   )
-  return createElement(
-    GroupFieldContext,
-    { value: groupField },
-    usePart(
-      group,
-      "group",
-      {},
-      defined({ ...props, render: controlRender(field, "div", render) })
-    )
+  const root = usePart(
+    group,
+    "group",
+    {},
+    defined({ ...props, render: controlRender(field, "div", render) })
   )
+  return <GroupFieldContext value={groupField}>{root}</GroupFieldContext>
 }
 
 // The hidden native radio that takes part in the form.
@@ -94,13 +91,13 @@ function Radio({
   disabled,
   render,
   ...props
-}: Omit<PartProps<"button", RadioState>, "value" | "onSelect"> & RadioProps) {
+}: Omit<PartProps<"button", RadioState>, "value" | "onSelect"> & RadioProps): OctaneNode {
   // A radio in a field of its own is that field's control. In the group's field, the group is.
   const nearest = useContext(FieldContext)
   const groupField = useContext(GroupFieldContext)
   const field = useJoinField(nearest === groupField ? null : nearest)
   const radio = defined({ value, disabled: disabled || field?.disabled })
-  const input = createElement(RadioInput, radio)
+  const input = <RadioInput {...radio} />
   return usePart(
     radioGroup,
     "root",

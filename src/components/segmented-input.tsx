@@ -8,7 +8,7 @@ import type {
   DateInputSegmentState,
   DateInputState,
 } from "@ui-sdk/core/date-input"
-import { createElement, Fragment, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import {
   renderElement,
   usePart,
@@ -77,17 +77,21 @@ function useSegmentedRoot(
   { render, children, ...props }: RootProps,
   Segment: (props: SegmentProps) => OctaneNode
 ) {
-  const content = (state: DateInputState) =>
-    createElement(
-      Fragment,
-      null,
+  const content = (state: DateInputState) => {
+    // Read now: JSX reads its children only when Octane renders the element.
+    const body =
       children === undefined
-        ? state.segments.map((segment) =>
-            createElement(Segment, { key: segment.key, segment })
-          )
-        : contentOf(children, state),
-      createElement(HiddenInput, { primitive })
+        ? state.segments.map((segment) => (
+            <Segment key={segment.key} segment={segment} />
+          ))
+        : contentOf(children, state)
+    return (
+      <>
+        {body}
+        <HiddenInput primitive={primitive} />
+      </>
     )
+  }
   return usePart(
     instance,
     "root",

@@ -6,7 +6,7 @@ import {
   type ColorPickerOptions,
   type ColorPickerState,
 } from "@ui-sdk/core/color-picker"
-import { createElement, Fragment, useId, type OctaneNode } from "octane"
+import { useId, type OctaneNode } from "octane"
 import {
   createParts,
   renderElement,
@@ -97,13 +97,16 @@ function ColorPicker({
   )
   const root = defined({
     ...props,
-    children: (state: ColorPickerState) =>
-      createElement(
-        Fragment,
-        null,
-        contentOf(children, state),
-        createElement(HiddenInput)
-      ),
+    children: (state: ColorPickerState) => {
+      // Read now: JSX reads its children only when Octane renders the element.
+      const content = contentOf(children, state)
+      return (
+        <>
+          {content}
+          <HiddenInput />
+        </>
+      )
+    },
     render: controlRender(field, "div", render),
   })
   return usePart(picker, "root", {}, root)

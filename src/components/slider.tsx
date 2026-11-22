@@ -10,8 +10,6 @@ import {
 } from "@ui-sdk/core/slider"
 import {
   createContext,
-  createElement,
-  Fragment,
   useContext,
   useMemo,
   type ComponentProps,
@@ -65,8 +63,16 @@ function withAfter<State>(
   children: DivProps<State>["children"],
   after: OctaneNode
 ) {
-  return (state: State) =>
-    createElement(Fragment, null, contentOf(children, state), after)
+  return (state: State) => {
+    // Read now: JSX reads its children only when Octane renders the element.
+    const content = contentOf(children, state)
+    return (
+      <>
+        {content}
+        {after}
+      </>
+    )
+  }
 }
 
 /**
@@ -130,21 +136,17 @@ function Slider<Value extends number | number[] = number | number[]>({
   // A range is a group the field's label names. A single thumb is the control itself.
   const shape = value ?? defaultValue
   const range = Array.isArray(shape) && shape.length > 1
-  const context = useMemo(
-    () => extendHandle(slider, { field: range ? null : field }),
-    [slider, range, field]
+  const context = useMemo(() =>
+    extendHandle(slider, { field: range ? null : field })
   )
   const root = defined({
     ...props,
-    children: withAfter(children, createElement(HiddenInput)),
+    children: withAfter(children, <HiddenInput />),
     render: controlRender(range ? field : null, "div", render),
   })
+  const element = usePart(slider, "root", {}, root)
   // A context is its own provider in Octane.
-  return createElement(
-    SliderContext,
-    { value: context },
-    usePart(slider, "root", {}, root)
-  )
+  return <SliderContext value={context}>{element}</SliderContext>
 }
 
 // The hidden input the form submits.
@@ -181,14 +183,15 @@ function SliderThumb({
 }: DivProps<SliderThumbState> & SliderThumbProps): OctaneNode {
   // Thumbs are told apart by their index.
   const thumb = { index, id: String(index) }
-  const input = createElement(
-    ThumbInput,
-    defined({
-      ...thumb,
-      "aria-label": label,
-      "aria-labelledby": labelledBy,
-      "aria-describedby": describedBy,
-    })
+  const input = (
+    <ThumbInput
+      {...defined({
+        ...thumb,
+        "aria-label": label,
+        "aria-labelledby": labelledBy,
+        "aria-describedby": describedBy,
+      })}
+    />
   )
   return usePart(sliderPrimitive, "thumb", thumb, {
     ...props,
@@ -210,7 +213,8 @@ function ThumbInput({
   const render = (input: Props) => {
     const merged: Props = field ? field.props(input) : input
     const { value, ...rest } = merged
-    return createElement("input", { ...rest, defaultValue: value })
+    const attrs: Props = { ...rest, defaultValue: value }
+    return <input {...attrs} />
   }
   return usePart(
     sliderPrimitive,
@@ -228,7 +232,7 @@ function SliderValue({
   children = text,
   ...props
 }: PartProps<"output", SliderValueState>): OctaneNode {
-  return createElement(parts.Value, defined({ ...props, children }))
+  return <parts.Value {...defined({ ...props, children })} />
 }
 
 const text = (state: SliderValueState) => state.text

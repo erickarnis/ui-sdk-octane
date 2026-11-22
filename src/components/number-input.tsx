@@ -9,9 +9,7 @@ import {
 } from "@ui-sdk/core/number-input"
 import {
   createContext,
-  createElement,
   createPortal,
-  Fragment,
   useContext,
   useMemo,
   type OctaneNode,
@@ -119,24 +117,21 @@ function NumberInput({
       controlId,
     })
   )
-  const context = useMemo(
-    () => extendHandle(numberInput, { field }),
-    [numberInput, field]
-  )
+  const context = useMemo(() => extendHandle(numberInput, { field }))
   useControllerEntry(controller, context)
-  const content = (current: NumberInputState) =>
-    createElement(
-      Fragment,
-      null,
-      contentOf(children, current),
-      createElement(HiddenInput)
+  const content = (current: NumberInputState) => {
+    // Read now: JSX reads its children only when Octane renders the element.
+    const body = contentOf(children, current)
+    return (
+      <>
+        {body}
+        <HiddenInput />
+      </>
     )
+  }
+  const root = usePart(numberInput, "root", {}, { ...props, children: content })
   // A context is its own provider in Octane.
-  return createElement(
-    NumberInputContext,
-    { value: context },
-    usePart(numberInput, "root", {}, { ...props, children: content })
-  )
+  return <NumberInputContext value={context}>{root}</NumberInputContext>
 }
 
 // The hidden input that submits the number as is.
@@ -224,15 +219,15 @@ function NumberInputScrubArea({
   if (!numberInput) {
     return renderElement("span", props, render, unconnected)
   }
-  return createElement(
-    NumberInputContext,
-    { value: numberInput },
-    createElement(ScrubAreaPart, {
-      numberInput,
-      scrub: defined({ orientation, pixelsPerStep }),
-      props,
-      render,
-    })
+  return (
+    <NumberInputContext value={numberInput}>
+      <ScrubAreaPart
+        numberInput={numberInput}
+        scrub={defined({ orientation, pixelsPerStep })}
+        props={props}
+        render={render}
+      />
+    </NumberInputContext>
   )
 }
 
@@ -259,9 +254,7 @@ function NumberInputScrubAreaCursor(
 ): OctaneNode {
   const numberInput = useContext(NumberInputContext)
   // A scrub area outside its number input renders before that mounts, with no cursor yet.
-  return numberInput
-    ? createElement(CursorPart, { ...props, numberInput })
-    : null
+  return numberInput ? <CursorPart {...props} numberInput={numberInput} /> : null
 }
 
 function CursorPart({

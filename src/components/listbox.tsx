@@ -6,7 +6,7 @@ import {
   type ListboxOptions,
   type ListboxState,
 } from "@ui-sdk/core/listbox"
-import { createElement, Fragment, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { useHandle } from "../internal.js"
 import {
   createParts,
@@ -108,20 +108,24 @@ function Listbox<T = string, Multiple extends boolean | undefined = false>({
     })
   )
   // Without children, a data listbox renders its items.
-  const content = (state: ListboxState) =>
-    children !== undefined
-      ? contentOf(children, state)
-      : items && createElement(ListboxItems, { items: state.items })
+  const content = (state: ListboxState) => {
+    if (children !== undefined) return contentOf(children, state)
+    // Read now: JSX reads a property only when Octane renders the element.
+    const { items: shown } = state
+    return items && <ListboxItems items={shown} />
+  }
   const root = {
     ...props,
     children: content,
     render: controlRender(field, "div", render),
   }
-  return createElement(
-    Fragment,
-    null,
-    usePart(listbox, "root", {}, root),
-    createElement(FormInputs, { handle: listbox })
+  // A hook, so called here: Octane builds JSX children when it renders them.
+  const element = usePart(listbox, "root", {}, root)
+  return (
+    <>
+      {element}
+      <FormInputs handle={listbox} />
+    </>
   )
 }
 
@@ -160,11 +164,7 @@ const ListboxSeparator = parts.Separator
  */
 function ListboxItems({ items }: { items: ListData<unknown> }): OctaneNode {
   const listbox = useListbox()
-  return createElement(ListItems, {
-    items,
-    parts: listParts,
-    keyOf: listbox.api.internal.keyOf,
-  })
+  return <ListItems items={items} parts={listParts} keyOf={listbox.api.internal.keyOf} />
 }
 
 const listParts: ListParts = {

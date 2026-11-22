@@ -42,6 +42,7 @@ const fixtures = {
   select: ["react", "octane"],
   combobox: ["react", "octane"],
   elements: ["octane"],
+  signals: ["octane"],
 }
 const builds = { react: "react", octane: "octane", baseui: "octane" }
 
@@ -88,6 +89,10 @@ async function open(fixture, variant) {
   const page = await browser.newPage()
   const errors = []
   page.on("pageerror", (error) => errors.push(error.message))
+  // A probe fixture reports what it found on the console.
+  page.on("console", (message) => {
+    if (message.text().startsWith("probe:")) console.log(`  ${fixture} ${variant} ${message.text()}`)
+  })
   await page.goto(`${origin(variant)}/?fixture=${fixture}&variant=${variant}`)
   await page.waitForSelector("body[data-ready], body[data-missing]", { state: "attached" })
   if (await page.$("body[data-missing]")) throw new Error(`No ${fixture} fixture for ${variant}.`)

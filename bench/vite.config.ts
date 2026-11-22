@@ -52,7 +52,7 @@ function withoutOctaneFixtures(): Plugin {
   return {
     name: "bench:without-octane-fixtures",
     enforce: "pre",
-    load: (id) => (/\.(baseui|octane)\.tsx$/.test(id.split("?", 1)[0] ?? "") ? "export {}" : null),
+    load: (id) => (/\.(baseui|octane)\.(tsx|tsrx)$/.test(id.split("?", 1)[0] ?? "") ? "export {}" : null),
   }
 }
 

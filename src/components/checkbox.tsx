@@ -9,12 +9,7 @@ import {
   type CheckboxOptions,
   type CheckboxState,
 } from "@ui-sdk/core/checkbox"
-import {
-  createContext,
-  createElement,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import { reading } from "../internal.js"
 import {
   createParts,
@@ -60,20 +55,16 @@ function Checkbox({
   // Inside a group, the group is the field's control.
   const field = useFieldControl()
   const fieldControl = group ? null : field
-  return createElement(
-    parts.Root,
-    defined({
-      ...props,
-      disabled: disabled || fieldControl?.disabled,
-      name: name ?? fieldControl?.name,
-      group: group ? reading(group, () => group.api) : undefined,
-      render: controlRender(
-        fieldControl,
-        "button",
-        render,
-        createElement(CheckboxInput)
-      ),
-    })
+  return (
+    <parts.Root
+      {...defined({
+        ...props,
+        disabled: disabled || fieldControl?.disabled,
+        name: name ?? fieldControl?.name,
+        group: group ? reading(group, () => group.api) : undefined,
+        render: controlRender(fieldControl, "button", render, <CheckboxInput />),
+      })}
+    />
   )
 }
 
@@ -104,7 +95,7 @@ function CheckboxGroup({
   Omit<
     PartProps<"div", CheckboxGroupState>,
     "defaultValue" | "onChange" | "onSelect"
-  >) {
+  >): OctaneNode {
   const field = useFieldControl()
   const group = usePrimitive(
     checkboxGroup,
@@ -122,20 +113,17 @@ function CheckboxGroup({
       debug,
     })
   )
-  return createElement(
-    CheckboxGroupContext,
-    { value: group },
-    usePart(
-      group,
-      "group",
-      {},
-      defined({
-        ...props,
-        render: controlRender(field, "div", render, createElement(GroupInput)),
-      }),
-      "div"
-    )
+  const root = usePart(
+    group,
+    "group",
+    {},
+    defined({
+      ...props,
+      render: controlRender(field, "div", render, <GroupInput />),
+    }),
+    "div"
   )
+  return <CheckboxGroupContext value={group}>{root}</CheckboxGroupContext>
 }
 
 export {

@@ -13,14 +13,13 @@ import {
   type CalendarWeekdayState,
 } from "@ui-sdk/core/calendar"
 import {
-  createElement,
   Fragment,
   useContext,
   useMemo,
   type ComponentProps,
   type OctaneNode,
 } from "octane"
-import { slotIn } from "../internal.js"
+import * as internal from "../internal.js"
 import {
   renderElement,
   usePart,
@@ -121,34 +120,28 @@ function Calendar({
     })
   )
   const content =
-    children === undefined
-      ? createElement(
-          Fragment,
-          null,
-          createElement(
-            "div",
-            null,
-            createElement(CalendarPrevious, {}),
-            createElement(CalendarHeading, {}),
-            createElement(CalendarNext, {})
-          ),
-          Array.from(
-            { length: Math.max(1, Math.floor(months ?? 1) || 1) },
-            (_, offset) =>
-              createElement(
-                Fragment,
-                { key: offset },
-                createElement(CalendarGrid, { offset })
-              )
+    children === undefined ? (
+      <>
+        <div>
+          <CalendarPrevious />
+          <CalendarHeading />
+          <CalendarNext />
+        </div>
+        {Array.from(
+          { length: Math.max(1, Math.floor(months ?? 1) || 1) },
+          (_, offset) => (
+            <Fragment key={offset}>
+              <CalendarGrid offset={offset} />
+            </Fragment>
           )
-        )
-      : children
+        )}
+      </>
+    ) : (
+      children
+    )
+  const root = usePart(calendar, "root", {}, { ...props, children: content })
   // In a context of its own, since a Date Picker renders the same parts over its own primitive.
-  return createElement(
-    CalendarContext,
-    { value: calendar },
-    usePart(calendar, "root", {}, { ...props, children: content })
-  )
+  return <CalendarContext value={calendar}>{root}</CalendarContext>
 }
 
 /**
@@ -192,17 +185,14 @@ function useSelect(
 }
 
 const options = (state: CalendarSelectState) =>
-  state.options.map((option) =>
-    createElement(
-      "option",
-      defined({
-        key: option.value,
-        value: option.value,
-        disabled: option.disabled,
-      }),
-      option.label
-    )
-  )
+  state.options.map((option) => (
+    <option
+      key={option.value}
+      {...defined({ value: option.value, disabled: option.disabled })}
+    >
+      {option.label}
+    </option>
+  ))
 
 /**
  * A native select of the months, in the locale, that turns the first month shown.
@@ -259,12 +249,15 @@ function CalendarGrid({
   ...props
 }: PartProps<"table", CalendarGridState> & { offset?: number }): OctaneNode {
   // Grids are told apart by their offset. The parts inside read the grid's state.
-  const content = (state: CalendarGridState) =>
-    createElement(
-      GridScope,
-      { offset, state },
-      contentOf<CalendarGridState>(children, state)
+  const content = (state: CalendarGridState) => {
+    // Read now: JSX reads its children only when Octane renders the element.
+    const body = contentOf<CalendarGridState>(children, state)
+    return (
+      <GridScope offset={offset} state={state}>
+        {body}
+      </GridScope>
     )
+  }
   return usePart(
     useCalendar("CalendarGrid"),
     "grid",
@@ -276,11 +269,11 @@ function CalendarGrid({
 
 // A function, as upstream's element would be built before the parts it names.
 function defaultGrid() {
-  return createElement(
-    Fragment,
-    null,
-    createElement(CalendarWeekdays, {}),
-    createElement(CalendarWeeks, {})
+  return (
+    <>
+      <CalendarWeekdays />
+      <CalendarWeeks />
+    </>
   )
 }
 
@@ -298,7 +291,7 @@ function GridScope({
     // The grid's state is new on every render; these are what it shows.
     [offset, state.month, state.weeks]
   )
-  return createElement(GridContext, { value: grid }, children)
+  return <GridContext value={grid}>{children}</GridContext>
 }
 
 /**
@@ -314,20 +307,17 @@ function CalendarWeekdays({
 }): OctaneNode {
   const calendar = useCalendar("CalendarWeekdays")
   const { offset, state } = useGrid("CalendarWeekdays")
-  return createElement(
-    "thead",
-    props,
-    createElement(
-      "tr",
-      slotIn(calendar, "weekdays", { id: String(offset) }),
-      state.weekdays.map((weekday, index) =>
-        createElement(
-          Fragment,
-          { key: weekday },
-          children ? children(index) : createElement(CalendarWeekday, { index })
-        )
-      )
-    )
+  // Read now: JSX reads its children only when Octane renders the element.
+  const row = internal.slotIn(calendar, "weekdays", { id: String(offset) })
+  const weekdays = state.weekdays.map((weekday, index) => (
+    <Fragment key={weekday}>
+      {children ? children(index) : <CalendarWeekday index={index} />}
+    </Fragment>
+  ))
+  return (
+    <thead {...props}>
+      <tr {...row}>{weekdays}</tr>
+    </thead>
   )
 }
 
@@ -364,30 +354,25 @@ function CalendarWeeks({
 }): OctaneNode {
   const calendar = useCalendar("CalendarWeeks")
   const { offset, state } = useGrid("CalendarWeeks")
-  return createElement(
-    "tbody",
-    props,
-    state.weeks.map((week, index) =>
-      createElement(
-        "tr",
-        {
-          key: week[0]?.date ?? index,
-          ...slotIn(calendar, "week", { id: `${offset}-${index}` }),
-        },
-        week.map((cell) =>
-          cell.hidden
-            ? createElement("td", { key: cell.date })
-            : createElement(
-                Fragment,
-                { key: cell.date },
-                children
-                  ? children(cell)
-                  : createElement(CalendarDay, { value: cell.date })
-              )
-        )
+  // Read now: JSX reads its children only when Octane renders the element.
+  const weeks = state.weeks.map((week, index) => {
+    const row = internal.slotIn(calendar, "week", { id: `${offset}-${index}` })
+    const cells = week.map((cell) =>
+      cell.hidden ? (
+        <td key={cell.date} />
+      ) : (
+        <Fragment key={cell.date}>
+          {children ? children(cell) : <CalendarDay value={cell.date} />}
+        </Fragment>
       )
     )
-  )
+    return (
+      <tr key={week[0]?.date ?? index} {...row}>
+        {cells}
+      </tr>
+    )
+  })
+  return <tbody {...props}>{weeks}</tbody>
 }
 
 /**

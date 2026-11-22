@@ -69,7 +69,7 @@
     },
     "./calendar": {
       "types": "./dist/src/components/calendar.d.ts",
-      "default": "./src/components/calendar.ts"
+      "default": "./src/components/calendar.tsx"
     },
     "./carousel": {
       "types": "./dist/src/components/carousel.d.ts",
@@ -77,7 +77,7 @@
     },
     "./checkbox": {
       "types": "./dist/src/components/checkbox.d.ts",
-      "default": "./src/components/checkbox.ts"
+      "default": "./src/components/checkbox.tsx"
     },
     "./collapsible": {
       "types": "./dist/src/components/collapsible.d.ts",
@@ -89,7 +89,7 @@
     },
     "./color-picker": {
       "types": "./dist/src/components/color-picker.d.ts",
-      "default": "./src/components/color-picker.ts"
+      "default": "./src/components/color-picker.tsx"
     },
     "./combobox": {
       "types": "./dist/src/components/combobox.d.ts",
@@ -105,11 +105,11 @@
     },
     "./date-input": {
       "types": "./dist/src/components/date-input.d.ts",
-      "default": "./src/components/date-input.ts"
+      "default": "./src/components/date-input.tsx"
     },
     "./date-picker": {
       "types": "./dist/src/components/date-picker.d.ts",
-      "default": "./src/components/date-picker.ts"
+      "default": "./src/components/date-picker.tsx"
     },
     "./dialog": {
       "types": "./dist/src/components/dialog.d.ts",
@@ -121,11 +121,11 @@
     },
     "./field": {
       "types": "./dist/src/components/field.d.ts",
-      "default": "./src/components/field.ts"
+      "default": "./src/components/field.tsx"
     },
     "./file-input": {
       "types": "./dist/src/components/file-input.d.ts",
-      "default": "./src/components/file-input.ts"
+      "default": "./src/components/file-input.tsx"
     },
     "./gesture": {
       "types": "./dist/src/components/gesture.d.ts",
@@ -145,7 +145,7 @@
     },
     "./input": {
       "types": "./dist/src/components/input.d.ts",
-      "default": "./src/components/input.ts"
+      "default": "./src/components/input.tsx"
     },
     "./label": {
       "types": "./dist/src/components/label.d.ts",
@@ -177,11 +177,11 @@
     },
     "./number-input": {
       "types": "./dist/src/components/number-input.d.ts",
-      "default": "./src/components/number-input.ts"
+      "default": "./src/components/number-input.tsx"
     },
     "./otp-input": {
       "types": "./dist/src/components/otp-input.d.ts",
-      "default": "./src/components/otp-input.ts"
+      "default": "./src/components/otp-input.tsx"
     },
     "./overlays": {
       "types": "./dist/src/components/overlays.d.ts",
@@ -193,7 +193,7 @@
     },
     "./password-input": {
       "types": "./dist/src/components/password-input.d.ts",
-      "default": "./src/components/password-input.ts"
+      "default": "./src/components/password-input.tsx"
     },
     "./popover": {
       "types": "./dist/src/components/popover.d.ts",
@@ -209,11 +209,11 @@
     },
     "./radio": {
       "types": "./dist/src/components/radio.d.ts",
-      "default": "./src/components/radio.ts"
+      "default": "./src/components/radio.tsx"
     },
     "./rating": {
       "types": "./dist/src/components/rating.d.ts",
-      "default": "./src/components/rating.ts"
+      "default": "./src/components/rating.tsx"
     },
     "./resizable": {
       "types": "./dist/src/components/resizable.d.ts",
@@ -225,7 +225,7 @@
     },
     "./segmented-control": {
       "types": "./dist/src/components/segmented-control.d.ts",
-      "default": "./src/components/segmented-control.ts"
+      "default": "./src/components/segmented-control.tsx"
     },
     "./select": {
       "types": "./dist/src/components/select.d.ts",
@@ -241,7 +241,7 @@
     },
     "./slider": {
       "types": "./dist/src/components/slider.d.ts",
-      "default": "./src/components/slider.ts"
+      "default": "./src/components/slider.tsx"
     },
     "./switch": {
       "types": "./dist/src/components/switch.d.ts",
@@ -269,11 +269,11 @@
     },
     "./textarea": {
       "types": "./dist/src/components/textarea.d.ts",
-      "default": "./src/components/textarea.ts"
+      "default": "./src/components/textarea.tsx"
     },
     "./time-input": {
       "types": "./dist/src/components/time-input.d.ts",
-      "default": "./src/components/time-input.ts"
+      "default": "./src/components/time-input.tsx"
     },
     "./timeline": {
       "types": "./dist/src/components/timeline.d.ts",

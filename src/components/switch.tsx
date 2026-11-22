@@ -5,7 +5,7 @@ import {
   type SwitchOptions,
   type SwitchState,
 } from "@ui-sdk/core/switch"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { createParts, usePart } from "../primitive.js"
 import {
   controlRender,
@@ -31,19 +31,15 @@ function Switch({
   ...props
 }: SwitchOptions & ButtonControlProps<SwitchState>): OctaneNode {
   const field = useFieldControl()
-  return createElement(
-    parts.Root,
-    defined({
-      ...props,
-      disabled: disabled || field?.disabled,
-      name: name ?? field?.name,
-      render: controlRender(
-        field,
-        "button",
-        render,
-        createElement(SwitchInput)
-      ),
-    })
+  return (
+    <parts.Root
+      {...defined({
+        ...props,
+        disabled: disabled || field?.disabled,
+        name: name ?? field?.name,
+        render: controlRender(field, "button", render, <SwitchInput />),
+      })}
+    />
   )
 }
 

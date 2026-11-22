@@ -12,7 +12,7 @@
 // the fixtures compiled for the server, which the Octane page's preview server
 // renders for upstream's server-rendering specs (see serverRenderRoute).
 import { execFile } from "node:child_process"
-import { readdirSync, realpathSync } from "node:fs"
+import { existsSync, readdirSync, realpathSync } from "node:fs"
 import path from "node:path"
 import { createRequire } from "node:module"
 import { fileURLToPath } from "node:url"
@@ -28,6 +28,13 @@ const fixtures = path.join(upstream, "apps/playground/src/fixtures") + "/"
 const source = path.join(repo, "src")
 // CONFORMANCE_PORT moves both pages, so two checkouts can run at once.
 const port = Number(process.env.CONFORMANCE_PORT ?? 4490)
+
+// A component's file: `.tsx` once it is written with templates, `.ts` until
+// then, so files can move to the new format one at a time.
+const componentFile = (name: string) =>
+  [".tsx", ".ts"]
+    .map((extension) => path.join(source, "components", name + extension))
+    .find((file) => existsSync(file)) ?? path.join(source, "components", `${name}.ts`)
 const ports = { octane: port, react: port + 1 }
 
 // Core's own modules by file name, for specs that reach into core. They are
@@ -78,7 +85,7 @@ function reactFixturesAsOctane(): Plugin {
         .replace(/from "@ui-sdk\/react\/primitive"/g, `from "${source}/primitive.ts"`)
         .replace(
           /from "@ui-sdk\/react\/([a-z-]+)"/g,
-          (_, name: string) => `from "${source}/components/${name}.ts"`
+          (_, name: string) => `from "${componentFile(name)}"`
         )
         // React's onChange on a text field is the browser's input event.
         .replace(/\bonChange=/g, "onInput=")

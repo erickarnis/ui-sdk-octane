@@ -11,12 +11,7 @@ import {
   type PopoverTriggerProps,
   type PopoverTriggerState,
 } from "@ui-sdk/core/popover"
-import {
-  createContext,
-  createElement,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import { HandleScope, useHandle, useNearest } from "../internal.js"
 import {
   createParts,
@@ -62,10 +57,10 @@ type PopoverProps = PopoverOptions & { children?: OctaneNode }
 function Popover({ children, container, ...options }: PopoverProps) {
   const handle = usePrimitive(popover, options)
   useControllerEntry(options.controller, handle)
-  return createElement(
-    HandleScope,
-    { handle },
-    createElement(ContainerContext, { value: container }, children)
+  return (
+    <HandleScope handle={handle}>
+      <ContainerContext value={container}>{children}</ContainerContext>
+    </HandleScope>
   )
 }
 
@@ -101,14 +96,12 @@ function PopoverTrigger({
       render,
       { open: false, disabled: !!disabled }
     )
-  return createElement(
-    TriggerContext,
-    { value: { shortcut } },
-    createElement(
-      Connected,
-      { primitive: popover, controller, fallback: unconnected },
-      createElement(parts.Trigger, defined(props))
-    )
+  return (
+    <TriggerContext value={{ shortcut }}>
+      <Connected primitive={popover} controller={controller} fallback={unconnected}>
+        <parts.Trigger {...defined(props)} />
+      </Connected>
+    </TriggerContext>
   )
 }
 
@@ -199,10 +192,7 @@ function ShortcutPart({
 function PopoverShortcut(props: ShortcutPartProps): OctaneNode {
   const trigger = useContext(TriggerContext)
   if (useNearest(popover))
-    return createElement(ShortcutPart, {
-      ...props,
-      inherited: trigger?.shortcut,
-    })
+    return <ShortcutPart {...props} inherited={trigger?.shortcut} />
   // Inside a trigger whose popover hasn't mounted yet, there's no shortcut to show.
   if (trigger) return null
   throw new Error("Popover parts must be used inside <Popover>.")

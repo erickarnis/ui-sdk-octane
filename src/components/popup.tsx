@@ -13,7 +13,6 @@ import * as core from "@ui-sdk/core/renderer"
 import {
   cloneElement,
   createContext,
-  createElement,
   createPortal,
   isValidElement,
   useContext,
@@ -56,7 +55,7 @@ function useOwnContainer(own: PopupContainer, root: Context<PopupContainer>) {
 // Renders a popup in place, in the top layer, or into its container. Without
 // top layer support, it goes to the body. Popups inside inherit the container.
 function renderPopup(element: OctaneNode, container: PopupContainer) {
-  return createElement(Popup, { element, container })
+  return <Popup element={element} container={container} />
 }
 
 function Popup({
@@ -73,7 +72,7 @@ function Popup({
   useLayoutEffect(() => {
     tree.shown()
     return tree.hidden
-  }, [tree])
+  })
   // A part's element carries the part's ref in its props, joined here by the
   // one that follows the tree.
   const tracked = isValidElement(element)
@@ -81,9 +80,11 @@ function Popup({
         ref: internal.mergeRefs(refOf(element), tree.track),
       })
     : element
-  const content = container
-    ? createElement(InheritedContainer, { value: container }, tracked)
-    : tracked
+  const content = container ? (
+    <InheritedContainer value={container}>{tracked}</InheritedContainer>
+  ) : (
+    tracked
+  )
   return target ? createPortal(content, target) : content
 }
 
@@ -182,9 +183,11 @@ function sheetViewport<State extends object>(
 ) {
   return (props: Props, state: State) => {
     const element = renderElement("div", props, render, state)
-    return internal.presentIn(popup, "viewport")
-      ? createElement("div", internal.slotIn(popup, "viewport", {}), element)
-      : element
+    return internal.presentIn(popup, "viewport") ? (
+      <div {...internal.slotIn(popup, "viewport", {})}>{element}</div>
+    ) : (
+      element
+    )
   }
 }
 
@@ -203,12 +206,9 @@ function sheetHeader(
   popup: Handle,
   setHeader: (header: HTMLElement | null) => void
 ) {
-  return internal.presentIn(popup, "header")
-    ? createElement(
-        "div",
-        internal.slotIn(popup, "header", {}, { ref: setHeader })
-      )
-    : null
+  return internal.presentIn(popup, "header") ? (
+    <div {...internal.slotIn(popup, "header", {}, { ref: setHeader })} />
+  ) : null
 }
 
 /** Renders an input into the sheet's header while there is one. */
@@ -239,9 +239,7 @@ function Connected({
   if (!handle) return fallback()
   // Always in a scope of its own with a controller, so its element stays when
   // that controller's instance takes over from the nearest one.
-  return controller
-    ? createElement(HandleScope, { handle }, children)
-    : children
+  return controller ? <HandleScope handle={handle}>{children}</HandleScope> : children
 }
 
 export { useControllerEntry, useControllerTarget } from "./controller-target.js"

@@ -197,7 +197,7 @@
     },
     "./popover": {
       "types": "./dist/src/components/popover.d.ts",
-      "default": "./src/components/popover.ts"
+      "default": "./src/components/popover.tsx"
     },
     "./preferences": {
       "types": "./dist/src/components/preferences.d.ts",
@@ -229,7 +229,7 @@
     },
     "./select": {
       "types": "./dist/src/components/select.d.ts",
-      "default": "./src/components/select.ts"
+      "default": "./src/components/select.tsx"
     },
     "./separator": {
       "types": "./dist/src/components/separator.d.ts",
@@ -245,11 +245,11 @@
     },
     "./switch": {
       "types": "./dist/src/components/switch.d.ts",
-      "default": "./src/components/switch.ts"
+      "default": "./src/components/switch.tsx"
     },
     "./tabs": {
       "types": "./dist/src/components/tabs.d.ts",
-      "default": "./src/components/tabs.ts"
+      "default": "./src/components/tabs.tsx"
     },
     "./text-match": {
       "types": "./dist/src/components/text-match.d.ts",

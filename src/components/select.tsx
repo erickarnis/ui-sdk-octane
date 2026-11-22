@@ -2,7 +2,8 @@
 // Ported from @ui-sdk/react's select (Apache-2.0, 0.1.0-beta.13). `Select`
 // reads its children for a `SelectContent` and for its items' labels, so it
 // is marked `descriptorChildren`: Octane then hands it the children written
-// in a template as elements, not as a compiled block.
+// in a template as elements, not as a compiled block. The rest take theirs as
+// a block, which they only render.
 import {
   select as selectPrimitive,
   type ListData,
@@ -24,7 +25,6 @@ import {
 import * as core from "@ui-sdk/core/renderer"
 import {
   createContext,
-  createElement,
   descriptorChildren,
   useId,
   type OctaneNode,
@@ -103,11 +103,7 @@ type SelectProps<
  * `T` is inferred from `value`, `defaultValue`, `items` or `onValueChange`, and
  * `multiple` makes the value a list.
  */
-// Typed as the plain component: the marker's own type has no name on Octane 0.16,
-// where a declaration that mentioned it would not resolve.
-const Select: <T = string, Multiple extends boolean | undefined = false>(
-  props: SelectProps<T, Multiple>
-) => OctaneNode = descriptorChildren(function Select<
+const Select = descriptorChildren(function Select<
   T = string,
   Multiple extends boolean | undefined = false,
 >({ children, container, ...options }: SelectProps<T, Multiple>): OctaneNode {
@@ -127,20 +123,16 @@ const Select: <T = string, Multiple extends boolean | undefined = false>(
   const found = hasChild(children, SelectContent)
   const [placed, place] = usePlacedContent(!!options.items && !found)
   const own = placed || found
-  return createElement(
-    HandleScope,
-    { handle: select },
-    createElement(
-      ContainerContext,
-      { value: container },
-      createElement(Placed, { value: place }, children),
-      createElement(
-        Placed,
-        { value: null },
-        options.items && !own ? createElement(SelectContent, {}) : null
-      ),
-      createElement(FormInputs, { handle: select })
-    )
+  return (
+    <HandleScope handle={select}>
+      <ContainerContext value={container}>
+        <Placed value={place}>{children}</Placed>
+        <Placed value={null}>
+          {options.items && !own ? <SelectContent /> : null}
+        </Placed>
+        <FormInputs handle={select} />
+      </ContainerContext>
+    </HandleScope>
   )
 })
 
@@ -175,10 +167,10 @@ function SelectTrigger({
         placeholder: true,
       }
     )
-  return createElement(
-    Connected,
-    { primitive: selectPrimitive, controller, fallback: unconnected },
-    createElement(TriggerPart, defined({ field, disabled, render, ...props }))
+  return (
+    <Connected primitive={selectPrimitive} controller={controller} fallback={unconnected}>
+      <TriggerPart {...defined({ field, disabled, render, ...props })} />
+    </Connected>
   )
 }
 
@@ -186,7 +178,7 @@ function TriggerPart({
   field,
   disabled,
   render,
-  children = createElement(SelectValue, {}),
+  children = <SelectValue />,
   ...props
 }: TriggerProps & { field: ReturnType<typeof useFieldControl> }): OctaneNode {
   // Without content, the trigger shows the value.
@@ -242,12 +234,14 @@ function SelectValue({
       unselected
     )
   }
-  return createElement(ValuePart, {
-    part: defined({ placeholder, maxLabels, getMoreLabel }),
-    render,
-    props,
-    children,
-  })
+  return (
+    <ValuePart
+      part={defined({ placeholder, maxLabels, getMoreLabel })}
+      render={render}
+      props={props}
+      children={children}
+    />
+  )
 }
 
 function ValuePart({
@@ -313,12 +307,12 @@ function SelectContent({
   })
   // Reading the part's state subscribes, so items that arrive after the
   // select rendered still render. `select.state` doesn't subscribe.
-  const body = (state: SelectContentState) =>
-    children !== undefined
-      ? contentOf(children, state)
-      : state.items &&
-        select.state.items &&
-        createElement(SelectItems, { items: state.items })
+  const body = (state: SelectContentState) => {
+    if (children !== undefined) return contentOf(children, state)
+    // Read now: JSX reads a property only when Octane renders the element.
+    const { items } = state
+    return items && select.state.items && <SelectItems items={items} />
+  }
   const element = usePart(select, "content", content, {
     ...props,
     children: body,
@@ -328,8 +322,7 @@ function SelectContent({
 }
 
 // From the part's state, so new items re-render the list. Without items it's empty.
-const listItems = (state: SelectContentState) =>
-  createElement(SelectItems, { items: state.items })
+const listItems = ({ items }: SelectContentState) => <SelectItems items={items} />
 
 /**
  * The listbox, when the content holds more than items, like a `SelectInput`. Without children, it renders the select's `items` that match.
@@ -450,9 +443,7 @@ type ValueIconProps = Omit<PartProps<"span">, "children">
  */
 function SelectValueIcon(props: ValueIconProps): OctaneNode {
   // A trigger outside its select renders before the select it names has mounted.
-  return useNearest(selectPrimitive)
-    ? createElement(SelectValueIconPart, props)
-    : null
+  return useNearest(selectPrimitive) ? <SelectValueIconPart {...props} /> : null
 }
 
 function SelectValueIconPart(props: ValueIconProps): OctaneNode {
@@ -492,11 +483,7 @@ const SelectArrow = parts.Arrow
  */
 function SelectItems({ items }: { items: ListData<unknown> }): OctaneNode {
   const select = useSelect()
-  return createElement(ListItems, {
-    items,
-    parts: listParts,
-    keyOf: select.api.internal.keyOf,
-  })
+  return <ListItems items={items} parts={listParts} keyOf={select.api.internal.keyOf} />
 }
 
 const listParts: ListParts = {

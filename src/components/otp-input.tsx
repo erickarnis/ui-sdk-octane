@@ -8,8 +8,6 @@ import {
   type OTPInputState,
 } from "@ui-sdk/core/otp-input"
 import {
-  createElement,
-  Fragment,
   useState,
   type ComponentProps,
   type OctaneNode,
@@ -47,8 +45,16 @@ function withInput<State>(
   children: DivProps<State>["children"],
   input: OctaneNode
 ) {
-  return (state: State) =>
-    createElement(Fragment, null, contentOf(children, state), input)
+  return (state: State) => {
+    // Read now: JSX reads its children only when Octane renders the element.
+    const content = contentOf(children, state)
+    return (
+      <>
+        {content}
+        {input}
+      </>
+    )
+  }
 }
 
 // The one real input, over the slots.
@@ -63,7 +69,7 @@ function OTPInputControl(props: InputProps) {
   const render = (control: Props) => {
     const merged: Props = field ? field.props(control) : control
     const { value: _, ...input } = merged
-    return createElement("input", defined({ ...input, defaultValue: initial }))
+    return <input {...defined({ ...input, defaultValue: initial })} />
   }
   return usePart(otp, "control", {}, { ...defined(props), render }, "input")
 }
@@ -85,25 +91,27 @@ function OTPInput({
   ...props
 }: OTPInputOptions & InputProps & DivProps<OTPInputState>): OctaneNode {
   const field = useFieldControl()
-  const input = createElement(
-    OTPInputControl,
-    defined({
-      id,
-      autoFocus,
-      "aria-label": label,
-      "aria-labelledby": labelledBy,
-      "aria-describedby": describedBy,
-      "aria-invalid": invalid,
-    })
+  const input = (
+    <OTPInputControl
+      {...defined({
+        id,
+        autoFocus,
+        "aria-label": label,
+        "aria-labelledby": labelledBy,
+        "aria-describedby": describedBy,
+        "aria-invalid": invalid,
+      })}
+    />
   )
-  return createElement(
-    parts.Root,
-    defined({
-      ...props,
-      disabled: disabled || field?.disabled,
-      name: name ?? field?.name,
-      children: withInput(children, input),
-    })
+  return (
+    <parts.Root
+      {...defined({
+        ...props,
+        disabled: disabled || field?.disabled,
+        name: name ?? field?.name,
+        children: withInput(children, input),
+      })}
+    />
   )
 }
 

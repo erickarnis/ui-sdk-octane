@@ -1,0 +1,464 @@
+{
+  "label": "after",
+  "date": "2026-11-22T06:13:24.517Z",
+  "runs": 15,
+  "warmup": 3,
+  "chromium": "157.0.8103.78",
+  "commit": "30ec091",
+  "results": [
+    {
+      "fixture": "tabs",
+      "scenario": "mount",
+      "variants": {
+        "react": {
+          "median": 85.06499999999994,
+          "p25": 72.24900000000012,
+          "p75": 98.17500000000001,
+          "min": 51.50800000000011,
+          "scriptMedian": 0.3999999999999993,
+          "renders": 1001,
+          "mutations": 3,
+          "runs": 15
+        },
+        "octane": {
+          "median": 104.46499999999997,
+          "p25": 85.55000000000001,
+          "p75": 118.38900000000008,
+          "min": 75.74599999999998,
+          "scriptMedian": 5.122000000000016,
+          "renders": 1001,
+          "mutations": 7,
+          "runs": 15
+        },
+        "baseui": {
+          "median": 180.64099999999982,
+          "p25": 151.4000000000002,
+          "p75": 202.44300000000015,
+          "min": 129.29700000000022,
+          "scriptMedian": 0.31500000000000017,
+          "renders": 4000,
+          "mutations": 11,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "tabs",
+      "scenario": "select one",
+      "variants": {
+        "react": {
+          "median": 23.657999999999735,
+          "p25": 21.54899999999982,
+          "p75": 32.4880000000003,
+          "min": 18.08199999999971,
+          "scriptMedian": 17.798999999999953,
+          "renders": 1001,
+          "mutations": 1020,
+          "runs": 15
+        },
+        "octane": {
+          "median": 34.80400000000028,
+          "p25": 31.950000000000145,
+          "p75": 41.29999999999967,
+          "min": 19.51199999999975,
+          "scriptMedian": 26.418000000000053,
+          "renders": 1001,
+          "mutations": 1020,
+          "runs": 15
+        },
+        "baseui": {
+          "median": 146.6120000000002,
+          "p25": 142.93399999999946,
+          "p75": 190.66600000000022,
+          "min": 131.55199999999923,
+          "scriptMedian": 101.78599999999999,
+          "renders": 7006,
+          "mutations": 1021,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "tabs",
+      "scenario": "unmount",
+      "variants": {
+        "react": {
+          "median": 17.47799999999966,
+          "p25": 15.673999999999744,
+          "p75": 20.370999999999917,
+          "min": 13.238999999999557,
+          "scriptMedian": 1.028000000000029,
+          "renders": 0,
+          "mutations": 2,
+          "runs": 15
+        },
+        "octane": {
+          "median": 14.658999999999978,
+          "p25": 14.266999999999364,
+          "p75": 19.33700000000016,
+          "min": 13.408000000000087,
+          "scriptMedian": 7.857000000000003,
+          "renders": 0,
+          "mutations": 6,
+          "runs": 15
+        },
+        "baseui": {
+          "median": 12.209000000000358,
+          "p25": 9.688999999999837,
+          "p75": 14.181000000000665,
+          "min": 8.97199999999998,
+          "scriptMedian": 0.11500000000008725,
+          "renders": 0,
+          "mutations": 7,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "switches",
+      "scenario": "mount",
+      "variants": {
+        "react": {
+          "median": 68.43100000000003,
+          "p25": 60.47599999999997,
+          "p75": 90.97100000000013,
+          "min": 44.11399999999999,
+          "scriptMedian": 0.8050000000000002,
+          "renders": 1000,
+          "mutations": 1,
+          "runs": 15
+        },
+        "octane": {
+          "median": 98.91300000000003,
+          "p25": 88.33500000000005,
+          "p75": 125.23200000000001,
+          "min": 63.07300000000004,
+          "scriptMedian": 2.1759999999999833,
+          "renders": 1000,
+          "mutations": 1,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "switches",
+      "scenario": "toggle all",
+      "variants": {
+        "react": {
+          "median": 38.49199999999975,
+          "p25": 34.15899999999983,
+          "p75": 47.78400000000005,
+          "min": 27.665000000000273,
+          "scriptMedian": 0.22900000000000698,
+          "renders": 1000,
+          "mutations": 4000,
+          "runs": 15
+        },
+        "octane": {
+          "median": 38.751999999999676,
+          "p25": 31.365999999999783,
+          "p75": 43.771,
+          "min": 28.4810000000002,
+          "scriptMedian": 0.4519999999999802,
+          "renders": 1000,
+          "mutations": 2500,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "popover",
+      "scenario": "mount",
+      "variants": {
+        "react": {
+          "median": 22.96999999999999,
+          "p25": 17.104000000000006,
+          "p75": 26.51999999999999,
+          "min": 14.62299999999994,
+          "scriptMedian": 0.2739999999999999,
+          "renders": 200,
+          "mutations": 1,
+          "runs": 15
+        },
+        "octane": {
+          "median": 30.65699999999999,
+          "p25": 26.27400000000002,
+          "p75": 43.68700000000003,
+          "min": 24.098999999999982,
+          "scriptMedian": 1.2460000000000007,
+          "renders": 200,
+          "mutations": 1,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "popover",
+      "scenario": "open",
+      "variants": {
+        "react": {
+          "median": 7.376999999999967,
+          "p25": 6.449999999999845,
+          "p75": 7.839999999999958,
+          "min": 5.817000000000183,
+          "scriptMedian": 2.336999999999999,
+          "renders": 1,
+          "mutations": 31,
+          "runs": 15
+        },
+        "octane": {
+          "median": 7.754000000000039,
+          "p25": 7.495000000000029,
+          "p75": 8.34299999999999,
+          "min": 6.002000000000063,
+          "scriptMedian": 2.6599999999999957,
+          "renders": 1,
+          "mutations": 33,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "popover",
+      "scenario": "close",
+      "variants": {
+        "react": {
+          "median": 4.450000000000065,
+          "p25": 4.1480000000000405,
+          "p75": 4.7160000000001645,
+          "min": 3.586999999999785,
+          "scriptMedian": 1.2189999999999979,
+          "renders": 1,
+          "mutations": 11,
+          "runs": 15
+        },
+        "octane": {
+          "median": 4.200999999999677,
+          "p25": 3.887000000000196,
+          "p75": 4.5999999999999375,
+          "min": 3.6920000000000286,
+          "scriptMedian": 1.0840000000000294,
+          "renders": 1,
+          "mutations": 13,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "select",
+      "scenario": "mount",
+      "variants": {
+        "react": {
+          "median": 3.6589999999999954,
+          "p25": 3.3099999999999934,
+          "p75": 4.011000000000001,
+          "min": 3.051000000000012,
+          "scriptMedian": 0.08600000000000013,
+          "renders": 0,
+          "mutations": 3,
+          "runs": 15
+        },
+        "octane": {
+          "median": 4.335999999999999,
+          "p25": 4.031000000000007,
+          "p75": 5.631999999999998,
+          "min": 3.735999999999989,
+          "scriptMedian": 0.2249999999999995,
+          "renders": 0,
+          "mutations": 23,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "select",
+      "scenario": "open",
+      "variants": {
+        "react": {
+          "median": 28.834000000000024,
+          "p25": 27.777999999999857,
+          "p75": 31.096999999999987,
+          "min": 16.855000000000064,
+          "scriptMedian": 13.768000000000002,
+          "renders": 500,
+          "mutations": 39,
+          "runs": 15
+        },
+        "octane": {
+          "median": 34.537999999999954,
+          "p25": 28.00999999999998,
+          "p75": 40.727999999999874,
+          "min": 20.09599999999989,
+          "scriptMedian": 17.33399999999996,
+          "renders": 500,
+          "mutations": 37,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "select",
+      "scenario": "close",
+      "variants": {
+        "react": {
+          "median": 16.364999999999963,
+          "p25": 15.194000000000152,
+          "p75": 17.125999999999753,
+          "min": 10.06600000000013,
+          "scriptMedian": 10.437999999999947,
+          "renders": 500,
+          "mutations": 17,
+          "runs": 15
+        },
+        "octane": {
+          "median": 19.305999999999823,
+          "p25": 15.087000000000295,
+          "p75": 21.98600000000006,
+          "min": 13.017000000000056,
+          "scriptMedian": 12.91999999999982,
+          "renders": 500,
+          "mutations": 15,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "combobox",
+      "scenario": "type",
+      "variants": {
+        "react": {
+          "median": 10.107999999999784,
+          "p25": 9.583999999999815,
+          "p75": 12.163999999999842,
+          "min": 7.959999999999967,
+          "scriptMedian": 4.804999999999948,
+          "renders": 0,
+          "mutations": 110,
+          "runs": 15
+        },
+        "octane": {
+          "median": 11.096999999999912,
+          "p25": 10.034000000000098,
+          "p75": 12.869999999999937,
+          "min": 8.306000000000147,
+          "scriptMedian": 4.631000000000052,
+          "renders": 0,
+          "mutations": 104,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "elements",
+      "scenario": "desc mount",
+      "variants": {
+        "octane": {
+          "median": 32.582,
+          "p25": 24.551000000000045,
+          "p75": 36.951000000000064,
+          "min": 19.97100000000007,
+          "scriptMedian": 0.06500000000000017,
+          "renders": 0,
+          "mutations": 1,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "elements",
+      "scenario": "spread mount",
+      "variants": {
+        "octane": {
+          "median": 42.42700000000021,
+          "p25": 32.551999999999914,
+          "p75": 44.605000000000004,
+          "min": 27.59199999999995,
+          "scriptMedian": 0.06000000000000016,
+          "renders": 0,
+          "mutations": 1,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "elements",
+      "scenario": "static mount",
+      "variants": {
+        "octane": {
+          "median": 26.843999999999646,
+          "p25": 24.712999999999987,
+          "p75": 33.383000000000166,
+          "min": 18.926999999999914,
+          "scriptMedian": 0.06399999999999982,
+          "renders": 0,
+          "mutations": 1,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "elements",
+      "scenario": "static update",
+      "variants": {
+        "octane": {
+          "median": 6.889999999999841,
+          "p25": 5.1640000000001685,
+          "p75": 8.005999999999958,
+          "min": 4.2719999999998315,
+          "scriptMedian": 0.14300000000000077,
+          "renders": 0,
+          "mutations": 2000,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "elements",
+      "scenario": "desc update",
+      "variants": {
+        "octane": {
+          "median": 11.725000000000207,
+          "p25": 9.427000000000074,
+          "p75": 12.98699999999986,
+          "min": 7.057000000000091,
+          "scriptMedian": 0.1370000000000017,
+          "renders": 0,
+          "mutations": 2000,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "elements",
+      "scenario": "spread update",
+      "variants": {
+        "octane": {
+          "median": 19.104999999999706,
+          "p25": 17.812999999999413,
+          "p75": 21.881999999999735,
+          "min": 11.860000000000426,
+          "scriptMedian": 0.1270000000000021,
+          "renders": 0,
+          "mutations": 2000,
+          "runs": 15
+        }
+      }
+    },
+    {
+      "fixture": "signals",
+      "scenario": "probe",
+      "variants": {
+        "octane": {
+          "median": 1.3279999999999959,
+          "p25": 1.2349999999999999,
+          "p75": 1.4440000000000008,
+          "min": 1.1530000000000014,
+          "scriptMedian": 0.08000000000000021,
+          "renders": 0,
+          "mutations": 0,
+          "runs": 15
+        }
+      }
+    }
+  ]
+}

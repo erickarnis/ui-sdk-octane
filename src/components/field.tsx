@@ -19,7 +19,6 @@ import * as core from "@ui-sdk/core/renderer"
 import type { FieldOutsideSlot } from "@ui-sdk/core/renderer"
 import {
   createContext,
-  createElement,
   useContext,
   useId,
   useMemo,
@@ -94,27 +93,18 @@ function Field({
   invalid,
   debug,
   ...props
-}: FieldOptions & PartProps<"div", FieldState>) {
+}: FieldOptions & PartProps<"div", FieldState>): OctaneNode {
   const field = usePrimitive(
     fieldPrimitive,
     defined({ name, disabled, invalid, debug })
   )
-  const context = useMemo(
-    () => extendHandle(field, { name, disabled }),
-    [field, name, disabled]
-  )
-  const described = useMemo(
-    (): Described => ({ by: "field", handle: field }),
-    [field]
-  )
-  return createElement(
-    FieldContext,
-    { value: context },
-    createElement(
-      DescribedContext,
-      { value: described },
-      usePart(field, "root", {}, props, "div")
-    )
+  const context = useMemo(() => extendHandle(field, { name, disabled }))
+  const described = useMemo((): Described => ({ by: "field", handle: field }))
+  const root = usePart(field, "root", {}, props, "div")
+  return (
+    <FieldContext value={context}>
+      <DescribedContext value={described}>{root}</DescribedContext>
+    </FieldContext>
   )
 }
 
@@ -139,7 +129,7 @@ function LabelInField({
 function FieldLabel(props: PartProps<"label", FieldState>): OctaneNode {
   const field = useContext(FieldContext)
   if (!field) return outside("label", "label", props)
-  return createElement(LabelInField, { field, props })
+  return <LabelInField field={field} props={props} />
 }
 
 function DescriptionInField({
@@ -166,7 +156,7 @@ function FieldDescription(
 ): OctaneNode {
   const described = useContext(DescribedContext)
   if (!described) return outside("description", "p", props)
-  return createElement(DescriptionInField, { described, props })
+  return <DescriptionInField described={described} props={props} />
 }
 
 function ErrorInField({
@@ -199,11 +189,7 @@ function FieldError({
       ? outside("error", "div", { ...props, children })
       : null
   }
-  return createElement(ErrorInField, {
-    field,
-    match,
-    props: { ...props, children },
-  })
+  return <ErrorInField field={field} match={match} props={{ ...props, children }} />
 }
 
 const message = (state: FieldErrorState) => state.message
@@ -239,7 +225,7 @@ function FieldControl({
 }: PartProps<"input", FieldState>): OctaneNode {
   const field = useContext(FieldContext)
   if (!field) return outside("control", "input", { ...rest, name, render })
-  return createElement(ControlInField, { field, name, render, rest })
+  return <ControlInField field={field} name={name} render={render} rest={rest} />
 }
 
 /**
@@ -249,30 +235,25 @@ function FieldSet({
   disabled,
   debug,
   ...props
-}: FieldSetOptions & Omit<PartProps<"fieldset", FieldSetState>, "disabled">) {
+}: FieldSetOptions &
+  Omit<PartProps<"fieldset", FieldSetState>, "disabled">): OctaneNode {
   const set = usePrimitive(fieldSet, defined({ disabled, debug }))
-  const described = useMemo(
-    (): Described => ({ by: "set", handle: set }),
-    [set]
-  )
-  return createElement(
-    DescribedContext,
-    { value: described },
-    usePart(set, "set", {}, props, "fieldset")
-  )
+  const described = useMemo((): Described => ({ by: "set", handle: set }))
+  const root = usePart(set, "set", {}, props, "fieldset")
+  return <DescribedContext value={described}>{root}</DescribedContext>
 }
 
 /**
  * Names the field set. Keep it the set's first child, where a <legend> names it natively.
  */
-function FieldLegend(props: PartProps<"legend", FieldSetState>) {
+function FieldLegend(props: PartProps<"legend", FieldSetState>): OctaneNode {
   return usePart(fieldSet, "legend", defined({ id: props.id }), props, "legend")
 }
 
 /**
  * Lays fields out. It has no role: a FieldSet is what names and disables a group.
  */
-function FieldGroup(props: PartProps<"div">) {
+function FieldGroup(props: PartProps<"div">): OctaneNode {
   return usePart(usePrimitive(fieldGroup, {}), "group", {}, props, "div")
 }
 

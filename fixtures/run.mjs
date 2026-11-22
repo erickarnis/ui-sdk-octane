@@ -23,7 +23,7 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { drive } from "./drive.mjs"
 
-const DEFAULT_OCTANE = "0.16.7,0.23.1"
+const DEFAULT_OCTANE = "0.23.1"
 const here = path.dirname(fileURLToPath(import.meta.url))
 const repo = path.dirname(here)
 

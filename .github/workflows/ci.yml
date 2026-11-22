@@ -53,8 +53,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The two ends of the peer range in package.json.
-        octane: ["0.16.7", "0.23.1"]
+        # The peer range in package.json is one release; the weekly
+        # octane-latest job tries the newest.
+        octane: ["0.23.1"]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

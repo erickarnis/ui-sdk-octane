@@ -6,7 +6,7 @@ UI SDK ships adapters for React, Vue, Svelte, Solid and Web Components. This is 
 
 - **All 67 component entries** `@ui-sdk/react` exports, plus `createParts`, `usePrimitive` and `usePart` for components of your own.
 - **Passes UI SDK's own test suite.** 4,958 of upstream's Playwright tests run unchanged against this adapter and pass. The 4 that fail also fail on `@ui-sdk/react`.
-- **Vite and Astro**, on Octane 0.16.7 to 0.23.
+- **Vite and Astro**, on Octane 0.23.1.
 
 > **Unofficial and experimental.** Not affiliated with Vercel or the Octane project. UI SDK and Octane are both in beta, and each release of this package works with exactly one version of `@ui-sdk/core`. It is not on npm yet.
 

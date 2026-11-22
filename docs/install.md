@@ -33,7 +33,7 @@ bun add --exact @ui-sdk/core@0.1.0-beta.13
 that only arrives through another package is not compiled.
 
 Octane's compiler also needs the `@tsrx/oxc` version its release names as a peer
-(`0.24.0` for Octane 0.23, `0.23.0` for Octane 0.16). That is part of setting up
+(`0.24.0` for Octane 0.23). That is part of setting up
 Octane, not of this package; `npm view octane@<version> peerDependencies` prints
 it.
 
@@ -121,20 +121,20 @@ not apply to its source. They resolve with `"moduleResolution": "bundler"`,
 
 | ui-sdk-octane | `@ui-sdk/core`           | Octane                            | Node         |
 | ------------- | ------------------------ | --------------------------------- | ------------ |
-| 0.0.1         | `0.1.0-beta.13`, exactly | `>=0.16.7 <0.24.0` (0.16.7–0.23.1) | `>=22.22.2`  |
+| 0.0.1         | `0.1.0-beta.13`, exactly | `>=0.23.1 <0.24.0` (0.23.1)        | `>=22.22.2`  |
 
-The newest release of each Octane minor in the range (0.16.7, 0.17.0, 0.18.0,
-0.19.3, 0.20.0, 0.21.0, 0.22.0, 0.23.0, 0.23.1) was checked from a packed tarball, in a
-Vite project and an Astro project, in development and from a production build
+Each release supports the newest Octane at the time and is written for it: the
+components use what that release offers (see "Writing Octane" in AGENTS.md for
+which feature needs which version). 0.23.1 was checked from a packed tarball, in
+a Vite project and an Astro project, in development and from a production build
 (`pnpm test:pack`). The Astro project used the `@octanejs/astro` release that
 names that Octane version, with Astro 7 and Vite 8, and mounts the app both in
 the browser only (`client:only="octane"`) and rendered on the server and
-hydrated (`client:load`). 0.16.7 and 0.23.0 were also checked installed by npm
-and by Bun; CI repeats those two with pnpm on every push.
+hydrated (`client:load`).
 
 The range stops at the newest version checked. Octane releases a minor version
 every few days, and an older, unrelated package named `octane` holds versions
-1.0.0 to 1.0.3 on npm, so an open range such as `>=0.16.7` would also accept
+1.0.0 to 1.0.3 on npm, so an open range such as `>=0.23.1` would also accept
 those. On a newer Octane your package manager reports the unmet peer; npm may
 refuse the install until you pass `--legacy-peer-deps`. A weekly CI job runs
 the same check on the newest Octane; when it passes, the next release raises

@@ -129,13 +129,10 @@ function Tree<Mode extends TreeMode = "single">({
   )
   // Without children, a data tree renders its items.
   const data = readIn(tree, () => tree.api.internal.items())
-  const content =
-    children ?? (data && createElement(TreeItems, { items: data }))
-  return createElement(
-    ItemContext,
-    { value: null },
-    usePart(tree, "root", {}, { ...props, children: content })
-  )
+  const content = children ?? (data && <TreeItems items={data} />)
+  // A hook, so called here: Octane builds JSX children when it renders them.
+  const root = usePart(tree, "root", {}, { ...props, children: content })
+  return <ItemContext value={null}>{root}</ItemContext>
 }
 
 type TreeItemComponentProps = Omit<
@@ -170,11 +167,9 @@ const TreeItem = descriptorChildren(function TreeItem({
       disabled,
       label,
     })
-    return createElement(
-      ItemContext,
-      { value },
-      usePart(treePrimitive, "item", item, { ...props, children })
-    )
+    // A hook, so called here: Octane builds JSX children when it renders them.
+    const element = usePart(treePrimitive, "item", item, { ...props, children })
+    return <ItemContext value={value}>{element}</ItemContext>
   })
 
 /**
@@ -203,33 +198,31 @@ const TreeGroup = parts.Group
 function TreeItems({ items }: { items: TreeItemData[] }): OctaneNode {
   const tree = useHandle(treePrimitive)
   const checkable = tree.state.checkable
-  return items.map((item) =>
-    createElement(
-      TreeItem,
-      defined({
-        key: item.value,
+  return items.map((item) => (
+    <TreeItem
+      key={item.value}
+      {...defined({
         value: item.value,
         branch: item.children !== undefined,
         disabled: item.disabled,
-      }),
-      checkable && createElement(TreeItemCheckbox, null),
-      createElement(
-        TreeItemLabel,
-        defined({
-          render: item.href
-            ? createElement("a", { href: item.href })
-            : undefined,
-        }),
-        item.label
-      ),
-      item.children &&
-        createElement(
-          TreeGroup,
-          null,
-          createElement(TreeItems, { items: item.children })
-        )
-    )
-  )
+      })}
+    >
+      {checkable && <TreeItemCheckbox />}
+      <TreeItemLabel
+        // A render element is cloned, so it stays a descriptor.
+        {...defined({
+          render: item.href ? createElement("a", { href: item.href }) : undefined,
+        })}
+      >
+        {item.label}
+      </TreeItemLabel>
+      {item.children && (
+        <TreeGroup>
+          <TreeItems items={item.children} />
+        </TreeGroup>
+      )}
+    </TreeItem>
+  ))
 }
 
 export {

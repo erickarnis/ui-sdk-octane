@@ -149,10 +149,7 @@ type TreeItemComponentProps = Omit<
  * `TreeGroup`, which makes it a branch. Set `branch` for one whose children
  * load later, or whose group is inside a component of your own.
  */
-// Typed as the plain component: the marker's own type has no name on Octane 0.16,
-// where a declaration that mentioned it would not resolve.
-const TreeItem: (props: TreeItemComponentProps) => OctaneNode =
-  descriptorChildren(function TreeItem({
+const TreeItem = descriptorChildren(function TreeItem({
     value,
     branch,
     disabled,

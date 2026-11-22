@@ -72,9 +72,7 @@ type CommandProps = CommandOptions &
 /**
  * A search field over an always-open list of commands. Renders a `div` around them.
  */
-// Typed as the plain component: the marker's own type has no name on Octane 0.16,
-// where a declaration that mentioned it would not resolve.
-const Command: (props: CommandProps) => OctaneNode = descriptorChildren(
+const Command = descriptorChildren(
   function Command({
     value,
     defaultValue,

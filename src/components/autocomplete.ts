@@ -32,7 +32,6 @@ import {
 } from "../primitive.js"
 import {
   hasChild,
-  settleChildren,
   Placed,
   usePlaceContent,
   usePlacedContent,
@@ -82,10 +81,7 @@ type AutocompleteProps = AutocompleteOptions & {
 /**
  * A text field that suggests as you type. The text is the value. Renders no element of its own.
  */
-// Typed as the plain component: the marker's own type has no name on Octane 0.16,
-// where a declaration that mentioned it would not resolve.
-const Autocomplete: (props: AutocompleteProps) => OctaneNode =
-  descriptorChildren(function Autocomplete({
+const Autocomplete = descriptorChildren(function Autocomplete({
     children,
     container,
     ...options
@@ -105,8 +101,6 @@ const Autocomplete: (props: AutocompleteProps) => OctaneNode =
       () => [headerElement, setHeader] as const,
       [headerElement, setHeader]
     )
-    // Before any popup reads them: see settleChildren.
-    settleChildren(children)
     // A data autocomplete renders its list, unless the app placed an
     // AutocompleteContent: in the markup, or inside a component of its own.
     const found = hasChild(children, AutocompleteContent)

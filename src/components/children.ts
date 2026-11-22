@@ -62,18 +62,6 @@ function usePlacedContent(wanted: boolean) {
   return [count > 0, wanted ? register : null] as const
 }
 
-// Reads every children prop the markup shows, so each resolves while its root
-// renders. Octane resolves a template's children where they are first read and
-// keeps that block for as long as the children live, even once it unmounts,
-// with its DOM: read first inside a popup, they would keep the first popup a
-// root opened. Read here, they keep the root, which they don't outlive. A
-// select reads its items' text the same way, in `learnLabels`.
-function settleChildren(children: OctaneNode): void {
-  for (const child of childrenOf(children)) {
-    if (isValidElement(child)) settleChildren(propsOf(child).children)
-  }
-}
-
 // A context is its own provider in Octane.
 const Placed = PlacedContext
 
@@ -155,7 +143,6 @@ export {
   learnLabels,
   notLabel,
   Placed,
-  settleChildren,
   usePlaceContent,
   usePlacedContent,
 }

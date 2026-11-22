@@ -72,7 +72,6 @@ Each runs against a development and a production build, except conformance, whic
 ## Limits
 
 - **A function as children must be the only child**, in Octane as in React.
-- **Before Octane 0.23.1, Octane keeps a closed popup's elements alive** when a component's children are first read inside the popup. Menu, combobox and autocomplete work around it. The trigger menu, and your own components built that way, may keep one closed popup in memory.
 - **Not verified:** `Preferences` rendered on a server, hot reload of a file that defines a primitive, drag and drop between lists, and browsers other than Chromium.
 
 ## Contributing

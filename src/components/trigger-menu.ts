@@ -70,10 +70,7 @@ type TriggerMenuProps<T = string> = TriggerMenuOptions<T> & {
  * Suggestions opened by a trigger like `@` or `/` in text. Inside a TokenInput
  * it uses that editor; otherwise render a TriggerMenuInput, or pass `editor`.
  */
-// Typed as the plain component: the marker's own type has no name on Octane 0.16,
-// where a declaration that mentioned it would not resolve.
-const TriggerMenu: <T = string>(props: TriggerMenuProps<T>) => OctaneNode =
-  descriptorChildren(function TriggerMenu<T = string>({
+const TriggerMenu = descriptorChildren(function TriggerMenu<T = string>({
     children,
     container,
     editor,

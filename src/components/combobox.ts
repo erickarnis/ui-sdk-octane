@@ -47,7 +47,6 @@ import {
 } from "../primitive.js"
 import {
   hasChild,
-  settleChildren,
   learnLabels,
   notLabel,
   Placed,
@@ -113,11 +112,7 @@ type ComboboxProps<
  * `T` is inferred from `value`, `defaultValue`, `items` or `onValueChange`, and
  * `multiple` makes the value a list.
  */
-// Typed as the plain component: the marker's own type has no name on Octane 0.16,
-// where a declaration that mentioned it would not resolve.
-const Combobox: <T = string, Multiple extends boolean | undefined = false>(
-  props: ComboboxProps<T, Multiple>
-) => OctaneNode = descriptorChildren(function Combobox<
+const Combobox = descriptorChildren(function Combobox<
   T = string,
   Multiple extends boolean | undefined = false,
 >({ children, container, ...options }: ComboboxProps<T, Multiple>): OctaneNode {
@@ -137,8 +132,6 @@ const Combobox: <T = string, Multiple extends boolean | undefined = false>(
     () => [headerElement, setHeader] as const,
     [headerElement, setHeader]
   )
-  // Before any popup reads them: see settleChildren.
-  settleChildren(children)
   // A data combobox renders its list, unless the app placed a ComboboxContent:
   // in the markup, or inside a component of its own.
   const found = hasChild(children, ComboboxContent)

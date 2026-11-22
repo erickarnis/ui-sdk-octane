@@ -56,7 +56,6 @@ import {
 } from "../primitive.js"
 import {
   hasChild,
-  settleChildren,
   Placed,
   usePlaceContent,
   usePlacedContent,
@@ -120,10 +119,8 @@ type MenuProps = MenuOptions & {
  * A list of actions and options, opened from a button or a right-click. Put its trigger and content inside.
  */
 // Marked, so a template hands it children it can read for a MenuContent.
-// Typed as the plain component: the marker's own type has no name on Octane 0.16,
-// where a declaration that mentioned it would not resolve.
-const Menu: (props: MenuProps) => OctaneNode = descriptorChildren(
-  function Menu({ children, items, container, ...options }: MenuProps) {
+const Menu = descriptorChildren(
+  function Menu({ children, items, container, ...options }: MenuProps): OctaneNode {
     const menubar = useContext(MenubarContext)
     const menu = usePrimitive(
       menuPrimitive,
@@ -134,8 +131,6 @@ const Menu: (props: MenuProps) => OctaneNode = descriptorChildren(
       })
     )
     useControllerEntry(options.controller, menu)
-    // Before any popup reads them: see settleChildren.
-    settleChildren(children)
     // A data menu renders its content, unless the app placed a MenuContent: in
     // the markup, or inside a component of its own.
     const found = hasChild(children, MenuContent)

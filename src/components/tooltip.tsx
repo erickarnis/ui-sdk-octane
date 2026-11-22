@@ -13,12 +13,7 @@ import {
   type TooltipTriggerProps,
   type TooltipTriggerState,
 } from "@ui-sdk/core/tooltip"
-import {
-  createContext,
-  createElement,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import { HandleScope, useNearest } from "../internal.js"
 import {
   createParts,
@@ -79,13 +74,17 @@ type TooltipProps = TooltipOptions & { children?: OctaneNode }
 /**
  * A short label or hint that appears when the pointer rests on its trigger or keyboard focus reaches it.
  */
-function Tooltip({ children, container, ...options }: TooltipProps) {
+function Tooltip({
+  children,
+  container,
+  ...options
+}: TooltipProps): OctaneNode {
   const handle = usePrimitive(tooltip, options)
   useControllerEntry(options.controller, handle)
-  return createElement(
-    HandleScope,
-    { handle },
-    createElement(ContainerContext, { value: container }, children)
+  return (
+    <HandleScope handle={handle}>
+      <ContainerContext value={container}>{children}</ContainerContext>
+    </HandleScope>
   )
 }
 
@@ -98,21 +97,22 @@ type TriggerPartProps = Omit<
 /**
  * The element the tooltip names or describes, usually a button.
  */
-function TooltipTrigger({ controller, ...props }: TriggerPartProps) {
+function TooltipTrigger({
+  controller,
+  ...props
+}: TriggerPartProps): OctaneNode {
   const { payload: _, render, ...rest } = props
   // Until the tooltip it names mounts, a trigger outside the tooltip is a plain button.
   const unconnected = () =>
     renderElement("button", { type: "button", ...rest }, render, {
       open: false,
     })
-  return createElement(
-    InTriggerContext,
-    { value: true },
-    createElement(
-      Connected,
-      { primitive: tooltip, controller, fallback: unconnected },
-      createElement(parts.Trigger, defined(props))
-    )
+  return (
+    <InTriggerContext value={true}>
+      <Connected primitive={tooltip} controller={controller} fallback={unconnected}>
+        <parts.Trigger {...defined(props)} />
+      </Connected>
+    </InTriggerContext>
   )
 }
 
@@ -129,7 +129,7 @@ function TooltipContent({
   anchor,
   container,
   ...props
-}: PartProps<"div", TooltipContentState> & TooltipContentProps) {
+}: PartProps<"div", TooltipContentState> & TooltipContentProps): OctaneNode {
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
   const content = defined({
     side,
@@ -172,7 +172,7 @@ function TooltipShortcut(
   props: PartProps<"span", TooltipShortcutState> & TooltipShortcutProps
 ): OctaneNode {
   const inTrigger = useContext(InTriggerContext)
-  if (useNearest(tooltip)) return createElement(ShortcutPart, props)
+  if (useNearest(tooltip)) return <ShortcutPart {...props} />
   // Inside a trigger whose tooltip hasn't mounted yet, there's no shortcut to show.
   if (inTrigger) return null
   throw new Error("Tooltip parts must be used inside <Tooltip>.")

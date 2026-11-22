@@ -5,7 +5,7 @@ import {
   type DialogOptions,
   type DialogTriggerProps,
 } from "@ui-sdk/core/dialog"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { dialogParts, type TriggerPartProps } from "./dialog-parts.js"
 import { sheetViewport } from "./popup.js"
 
@@ -27,8 +27,8 @@ const Dialog = parts.Root
  */
 function DialogTrigger(
   props: TriggerPartProps & Pick<DialogTriggerProps, "controller">
-) {
-  return createElement(parts.Trigger, props)
+): OctaneNode {
+  return <parts.Trigger {...props} />
 }
 
 /**

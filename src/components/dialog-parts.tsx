@@ -16,12 +16,7 @@ import type {
   DialogTriggerProps,
   DialogTriggerState,
 } from "@ui-sdk/core/dialog"
-import {
-  createContext,
-  createElement,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import { HandleScope, useHandle, useNearest } from "../internal.js"
 import {
   createParts,
@@ -86,10 +81,10 @@ function dialogParts(
   }: DialogOptions & { children?: OctaneNode }) {
     const handle = usePrimitive(primitive, options)
     useControllerEntry(options.controller, handle)
-    return createElement(
-      HandleScope,
-      { handle },
-      createElement(ContainerContext, { value: container }, children)
+    return (
+      <HandleScope handle={handle}>
+        <ContainerContext value={container}>{children}</ContainerContext>
+      </HandleScope>
     )
   }
 
@@ -123,14 +118,12 @@ function dialogParts(
         render,
         { open: false, disabled: !!disabled }
       )
-    return createElement(
-      TriggerContext,
-      { value: { shortcut } },
-      createElement(
-        Connected,
-        { primitive, controller, fallback: unconnected },
-        createElement(parts.Trigger, defined(props))
-      )
+    return (
+      <TriggerContext value={{ shortcut }}>
+        <Connected primitive={primitive} controller={controller} fallback={unconnected}>
+          <parts.Trigger {...defined(props)} />
+        </Connected>
+      </TriggerContext>
     )
   }
 
@@ -183,10 +176,7 @@ function dialogParts(
   function Shortcut(props: ShortcutPartProps): OctaneNode {
     const trigger = useContext(TriggerContext)
     if (useNearest(primitive))
-      return createElement(ShortcutPart, {
-        ...props,
-        inherited: trigger?.shortcut,
-      })
+      return <ShortcutPart {...props} inherited={trigger?.shortcut} />
     // Inside a trigger whose dialog hasn't mounted yet, there's no shortcut to show.
     if (trigger) return null
     throw new Error(`${name} parts must be used inside <${name}>.`)

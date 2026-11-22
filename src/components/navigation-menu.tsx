@@ -15,7 +15,6 @@ import {
 } from "@ui-sdk/core/navigation-menu"
 import {
   createContext,
-  createElement,
   createPortal,
   useContext,
   useId,
@@ -111,10 +110,10 @@ function NavigationMenu({
     })
   )
   const element = usePart(menu, "root", {}, props, nested ? "div" : "nav")
-  return createElement(
-    ItemContext,
-    { value: null },
-    createElement(ContainerContext, { value: container }, element)
+  return (
+    <ItemContext value={null}>
+      <ContainerContext value={container}>{element}</ContainerContext>
+    </ItemContext>
   )
 }
 
@@ -134,11 +133,9 @@ function NavigationMenuItem({
   // Its value reaches a menu nested in it, and its content.
   const generated = useId()
   const item = { value: value ?? generated }
-  return createElement(
-    ItemContext,
-    { value: item.value },
-    usePart(navigationMenu, "item", item, props, "li")
-  )
+  // Called here, not in the JSX, which Octane reads only when it renders the element.
+  const element = usePart(navigationMenu, "item", item, props, "li")
+  return <ItemContext value={item.value}>{element}</ItemContext>
 }
 
 /**

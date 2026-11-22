@@ -9,7 +9,7 @@ import {
   type HoverCardTriggerProps,
   type HoverCardTriggerState,
 } from "@ui-sdk/core/hover-card"
-import { createContext, createElement, type OctaneNode } from "octane"
+import { createContext, type OctaneNode } from "octane"
 import { HandleScope } from "../internal.js"
 import {
   createParts,
@@ -48,10 +48,10 @@ function HoverCard({
 }: HoverCardProps): OctaneNode {
   const handle = usePrimitive(hoverCard, options)
   useControllerEntry(options.controller, handle)
-  return createElement(
-    HandleScope,
-    { handle },
-    createElement(ContainerContext, { value: container }, children)
+  return (
+    <HandleScope handle={handle}>
+      <ContainerContext value={container}>{children}</ContainerContext>
+    </HandleScope>
   )
 }
 
@@ -65,10 +65,10 @@ function HoverCardTrigger({
   const { payload: _, render, ...rest } = props
   // Until the card it names mounts, a trigger outside the card is a plain link.
   const unconnected = () => renderElement("a", rest, render, { open: false })
-  return createElement(
-    Connected,
-    { primitive: hoverCard, controller, fallback: unconnected },
-    createElement(parts.Trigger, defined(props))
+  return (
+    <Connected primitive={hoverCard} controller={controller} fallback={unconnected}>
+      <parts.Trigger {...defined(props)} />
+    </Connected>
   )
 }
 
@@ -86,7 +86,7 @@ function HoverCardContent({
   keepMounted,
   container,
   ...props
-}: PartProps<"div", HoverCardContentState> & HoverCardContentProps) {
+}: PartProps<"div", HoverCardContentState> & HoverCardContentProps): OctaneNode {
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
   const content = defined({
     side,

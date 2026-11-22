@@ -6,7 +6,7 @@ import {
   type PaginationLinkState,
   type PaginationStepState,
 } from "@ui-sdk/core/pagination"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { useHandle } from "../internal.js"
 import { createParts, usePart, type PartProps } from "../primitive.js"
 import { defined } from "./octane.js"
@@ -105,7 +105,7 @@ function PaginationEllipsis({
   children = "…",
   ...props
 }: PartProps<"span">): OctaneNode {
-  return createElement(parts.Ellipsis, defined({ ...props, children }))
+  return <parts.Ellipsis {...defined({ ...props, children })} />
 }
 
 export {

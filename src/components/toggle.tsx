@@ -9,12 +9,7 @@ import {
   type ToggleOptions,
   type ToggleState,
 } from "@ui-sdk/core/toggle"
-import {
-  createContext,
-  createElement,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import { reading } from "../internal.js"
 import {
   createParts,
@@ -45,13 +40,14 @@ function Toggle(
 ): OctaneNode {
   const group = useContext(ToggleGroupContext)
   const toolbar = useToolbarScope()
-  return createElement(
-    parts.Root,
-    defined({
-      ...props,
-      group: group ? reading(group, () => group.api) : undefined,
-      toolbar,
-    })
+  return (
+    <parts.Root
+      {...defined({
+        ...props,
+        group: group ? reading(group, () => group.api) : undefined,
+        toolbar,
+      })}
+    />
   )
 }
 
@@ -80,7 +76,7 @@ function ToggleGroup({
   Omit<
     PartProps<"div", ToggleGroupState>,
     "defaultValue" | "onChange" | "onSelect"
-  >) {
+  >): OctaneNode {
   const toolbar = useToolbarScope()
   const group = usePrimitive(
     toggleGroup,
@@ -98,11 +94,9 @@ function ToggleGroup({
       toolbar,
     })
   )
-  return createElement(
-    ToggleGroupContext,
-    { value: group },
-    usePart(group, "group", {}, props, "div")
-  )
+  // Called here, not in the JSX, which Octane reads only when it renders the element.
+  const element = usePart(group, "group", {}, props, "div")
+  return <ToggleGroupContext value={group}>{element}</ToggleGroupContext>
 }
 
 export {

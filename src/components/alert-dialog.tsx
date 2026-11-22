@@ -8,7 +8,7 @@ import type {
   dialog as dialogPrimitive,
   DialogOptions,
 } from "@ui-sdk/core/dialog"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 import { dialogParts, type TriggerPartProps } from "./dialog-parts.js"
 
 // The alert dialog's slots and state are the dialog's. Only its options are narrower.
@@ -32,7 +32,7 @@ function AlertDialog(props: AlertDialogProps): OctaneNode {
   // SAFETY: the parts run the alert dialog primitive, which passes its
   // callbacks only its own reasons, a subset of the dialog's.
   const options = props as DialogOptions & { children?: OctaneNode }
-  return createElement(alertParts.Root, options)
+  return <alertParts.Root {...options} />
 }
 
 /**
@@ -41,7 +41,7 @@ function AlertDialog(props: AlertDialogProps): OctaneNode {
 function AlertDialogTrigger(
   props: TriggerPartProps & Pick<AlertDialogTriggerProps, "controller">
 ): OctaneNode {
-  return createElement(alertParts.Trigger, props)
+  return <alertParts.Trigger {...props} />
 }
 
 /**

@@ -2,7 +2,6 @@
 // Ported from @ui-sdk/react's preferences (Apache-2.0, 0.1.0-beta.13).
 import { preferencesScript, type PreferenceLike } from "@ui-sdk/core"
 import {
-  createElement,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -85,8 +84,7 @@ function Preferences({
     (listener: () => void) => {
       const stops = list.map((preference) => preference.subscribe(listener))
       return () => stops.forEach((stop) => stop())
-    },
-    [list]
+    }
   )
   // One string, so the snapshot compares equal until a value changes.
   const values = useSyncExternalStore(
@@ -97,6 +95,7 @@ function Preferences({
   )
   // Before paint, where no script ran, like a root layout that mounts `<html>`
   // again on a client navigation, and again once subscribing reads saved values.
+  // The arrays stay: the effects read the values through `list`, not `values`.
   useLayoutEffect(() => show(list, element.current), [list, values])
   useEffect(() => show(list, element.current), [list, values])
   const shown: unknown = JSON.parse(values)
@@ -107,25 +106,27 @@ function Preferences({
     }
   })
   // The script changes these attributes before hydration, so they may differ from the server's HTML.
-  return createElement(
-    "div",
-    {
-      "data-slot": "preferences",
-      ...attributes,
-      ...props,
+  return (
+    <div
+      data-slot="preferences"
+      {...attributes}
+      {...props}
       // A ref may be a list of refs in Octane; `mergeRefs` makes one stable list.
-      ref: mergeRefs(element, ref ?? null),
-      style: contents(style),
-      suppressHydrationWarning: true,
-    },
-    fromServer
-      ? createElement("script", {
-          nonce,
-          suppressHydrationWarning: true,
-          dangerouslySetInnerHTML: { __html: preferencesScript(list) },
-        })
-      : null,
-    children
+      // SAFETY: `mergeRefs` returns one of the two refs or a list of both, and
+      // both are refs to this div.
+      ref={mergeRefs(element, ref ?? null) as ComponentProps<"div">["ref"]}
+      style={contents(style)}
+      suppressHydrationWarning
+    >
+      {fromServer ? (
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: preferencesScript(list) }}
+        />
+      ) : null}
+      {children}
+    </div>
   )
 }
 

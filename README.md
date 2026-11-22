@@ -65,7 +65,8 @@ Until the package is on npm, build a tarball from a checkout (`pnpm pack`) and i
 | `pnpm test` | The adapter and `@ui-sdk/react` rendering the same source, driven with the same steps and compared. |
 | `pnpm test:modes` | Server rendering, hydration, `StrictMode`, `<Activity>`, several roots on a page, transitions and Suspense. |
 | `pnpm test:components` | A page of checks for every component. |
-| `pnpm test:pack` | The packed tarball installed into fresh Vite and Astro projects, on the oldest and newest supported Octane. |
+| `pnpm test:pack` | The packed tarball installed into fresh Vite and Astro projects, on the supported Octane. |
+| `pnpm bench` | Not a test: the time, renders and DOM changes of mounting, updating, opening and typing, against `@ui-sdk/react` on the same fixtures, in production builds. `bench/results/baseline.json` is the reference. |
 
 Each runs against a development and a production build, except conformance, which uses a development build as upstream's own runs do.
 
@@ -76,7 +77,7 @@ Each runs against a development and a production build, except conformance, whic
 
 ## Contributing
 
-[AGENTS.md](AGENTS.md) has the rules the code follows and the ways Octane differs from React that matter here. `src/primitive.ts` is kept in the order of upstream's `use-primitive.tsx` so the two read side by side.
+[AGENTS.md](AGENTS.md) has the rules the code follows, including how it is written for Octane ("Writing Octane"). `src/primitive.ts` is kept in the order of upstream's `use-primitive.tsx` so the two read side by side.
 
 ## License
 

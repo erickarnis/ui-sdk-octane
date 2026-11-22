@@ -1,12 +1,13 @@
+/** @jsxImportSource octane */
 // Ported from @ui-sdk/react's list-text (Apache-2.0, 0.1.0-beta.13).
 import type { MatchSegment } from "@ui-sdk/core/combobox"
-import { createElement, type OctaneNode } from "octane"
+import type { OctaneNode } from "octane"
 
 // An item's text with the parts that matched in `<mark>`, for the list
 // components' item text parts.
 function markSegments(segments: MatchSegment[]): OctaneNode[] {
   return segments.map(({ text, match }, index) =>
-    match ? createElement("mark", { key: index }, text) : text
+    match ? <mark key={index}>{text}</mark> : text
   )
 }
 

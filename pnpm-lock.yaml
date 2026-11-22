@@ -17,6 +17,9 @@ importers:
       '@guidepup/virtual-screen-reader':
         specifier: ^0.33.0
         version: 0.33.0
+      '@octanejs/base-ui':
+        specifier: 0.1.77
+        version: 0.1.77(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
       '@playwright/test':
         specifier: 1.63.0
         version: 1.63.0
@@ -114,6 +117,15 @@ packages:
   '@emnapi/wasi-threads@2.2.0':
     resolution: {integrity: sha512-JP7OYH38Q7+pyTAe14raZHLQIK7BDKbdwji+Xi3pcd/6QkJYQH3SX4wu6EplGrGJWRepoNzedfm0G3B9Z4e9Rw==}
 
+  '@floating-ui/core@1.8.0':
+    resolution: {integrity: sha512-0CIZ5itps/8x7BG8dEIhs53BvCUH2PCoogtakwRTut+Arm58sJooJ0AuZhLw2HJYIR5cMLNPBSS728sPho2khQ==}
+
+  '@floating-ui/dom@1.8.0':
+    resolution: {integrity: sha512-yXSrzeHZBTZadLOlfyhCkJHNeLJnHRnRInwdZ40L7ZiaAtrBwoYlsDrX3v5zB1Utk7CLfzcOVnVVWoXEky7Ceg==}
+
+  '@floating-ui/utils@0.2.12':
+    resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
+
   '@guidepup/virtual-screen-reader@0.33.0':
     resolution: {integrity: sha512-CXMkIx19oFZ7BS7TcvDibXn6A2RsEs8nVX9IijHW7HQ0qTGHgc2WErkaMi12YPQi1Zypxr36NfRYWgBxUNvMtQ==}
     engines: {node: '>=20'}
@@ -147,6 +159,34 @@ packages:
   '@noble/hashes@2.4.0':
     resolution: {integrity: sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==}
     engines: {node: '>= 20.19.0'}
+
+  '@octanejs/base-ui-utils@0.1.25':
+    resolution: {integrity: sha512-zbKUijzAYG4Cwx5+ZmdJXYzBCJHEozh5Cl9sjc2hsWwayNzD9zbhQAw/BNcnLbe9220PQjDZufxnATQoAEV84Q==}
+    engines: {node: '>=22.22.2'}
+    peerDependencies:
+      octane: ^0.23.0
+
+  '@octanejs/base-ui@0.1.77':
+    resolution: {integrity: sha512-S09bJZ/ffJK1r6R16Il8aZdrt1doPNKg9/+wlw1P4b731LF4dFQCnUss5iG1bsjH7Ez3nysKp+eOxZg94QC/TA==}
+    engines: {node: '>=22.22.2'}
+    peerDependencies:
+      '@date-fns/tz': ^1.2.0
+      date-fns: ^4.0.0
+      luxon: ^3.7.2
+      octane: ^0.23.0
+    peerDependenciesMeta:
+      '@date-fns/tz':
+        optional: true
+      date-fns:
+        optional: true
+      luxon:
+        optional: true
+
+  '@octanejs/floating-ui@0.1.76':
+    resolution: {integrity: sha512-idBMjz205EO3eGJnsmIyUP0yYJ0njeqjP2NOxxoWINLoqcKDJ51dMlS7Ae2xPNeON0sxOL8rzMPmion0vVwogA==}
+    engines: {node: '>=22.22.2'}
+    peerDependencies:
+      octane: ^0.23.0
 
   '@oxc-project/types@0.150.0':
     resolution: {integrity: sha512-rDS5/31E9HfPl/CIzGrn0DOlvBbXFseQ5URJ9sYMfstbKLD/c6Gm9vmRzRGDdAXyOIL4zmO37lc9RIwYqVruZw==}
@@ -1134,6 +1174,9 @@ packages:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
 
+  reselect@5.3.0:
+    resolution: {integrity: sha512-XGoLeRAVzUTcJ1qkxPQhDJyIZ5d6zzZD9nT7AEZOaaU9UbWclhycElmhO+VD5bFeLuzhPBaOV2oXC8uG35ZSpg==}
+
   resolve-pkg-maps@1.0.0:
     resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
 
@@ -1177,6 +1220,9 @@ packages:
   supports-hyperlinks@3.2.0:
     resolution: {integrity: sha512-zFObLMyZeEwzAoKCyu1B91U79K2t7ApXuQfo8OuxwXLDgcKxuwM+YvcbIhm6QWqz7mHUH1TVytR1PwVVjEuMig==}
     engines: {node: '>=14.18'}
+
+  tabbable@6.5.2:
+    resolution: {integrity: sha512-XgdnB1nGU6KU4VgMnZPaZCx7M1hBrLyEiZYau2G2gq9UT0d7d4FUBlNX7vvPlm/B1vk1PjrzJBx9Lbv4fsqS9g==}
 
   tailwindcss@4.3.5:
     resolution: {integrity: sha512-FcQk9BuffmEHJP2G0XmB2SplU1aLTI7j07Kunk+U74Ny+XiWOtzXz9aujFZ/avntw1e2cOv/3PkgzflQ7gX2vQ==}
@@ -1354,6 +1400,17 @@ snapshots:
       tslib: 2.9.1
     optional: true
 
+  '@floating-ui/core@1.8.0':
+    dependencies:
+      '@floating-ui/utils': 0.2.12
+
+  '@floating-ui/dom@1.8.0':
+    dependencies:
+      '@floating-ui/core': 1.8.0
+      '@floating-ui/utils': 0.2.12
+
+  '@floating-ui/utils@0.2.12': {}
+
   '@guidepup/virtual-screen-reader@0.33.0':
     dependencies:
       '@testing-library/dom': 10.4.2
@@ -1392,6 +1449,26 @@ snapshots:
     optional: true
 
   '@noble/hashes@2.4.0': {}
+
+  '@octanejs/base-ui-utils@0.1.25(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
+    dependencies:
+      '@floating-ui/utils': 0.2.12
+      octane: 0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+      reselect: 5.3.0
+
+  '@octanejs/base-ui@0.1.77(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
+    dependencies:
+      '@floating-ui/utils': 0.2.12
+      '@octanejs/base-ui-utils': 0.1.25(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
+      '@octanejs/floating-ui': 0.1.76(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
+      octane: 0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+
+  '@octanejs/floating-ui@0.1.76(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
+    dependencies:
+      '@floating-ui/dom': 1.8.0
+      '@floating-ui/utils': 0.2.12
+      octane: 0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+      tabbable: 6.5.2
 
   '@oxc-project/types@0.150.0': {}
 
@@ -2136,6 +2213,8 @@ snapshots:
 
   require-directory@2.1.1: {}
 
+  reselect@5.3.0: {}
+
   resolve-pkg-maps@1.0.0: {}
 
   rolldown@1.2.19:
@@ -2192,6 +2271,8 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
       supports-color: 7.2.0
+
+  tabbable@6.5.2: {}
 
   tailwindcss@4.3.5: {}
 

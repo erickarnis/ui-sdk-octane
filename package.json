@@ -358,6 +358,7 @@
     "@arethetypeswrong/cli": "0.18.5",
     "@axe-core/playwright": "^4.14.0",
     "@guidepup/virtual-screen-reader": "^0.33.0",
+    "@octanejs/base-ui": "0.1.77",
     "@playwright/test": "1.63.0",
     "@tailwindcss/vite": "^4.3.5",
     "@tsrx/oxc": "0.24.0",

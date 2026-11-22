@@ -8,3 +8,4 @@ dist/
 test-results/
 .upstream/
 .conformance-dist/
+.bench-dist/

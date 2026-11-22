@@ -7,13 +7,7 @@ import {
   type RatingOptions,
   type RatingState,
 } from "@ui-sdk/core/rating"
-import {
-  createContext,
-  createElement,
-  Fragment,
-  useContext,
-  type OctaneNode,
-} from "octane"
+import { createContext, useContext, type OctaneNode } from "octane"
 import { usePart, usePrimitive, type PartProps } from "../primitive.js"
 import { controlRender, FieldContext, useJoinField } from "./field-context.js"
 import { contentOf, defined } from "./octane.js"
@@ -72,13 +66,11 @@ function Rating({
     })
   )
   // A context is its own provider in Octane.
-  const stars = Array.from({ length: max }, (_, at) =>
-    createElement(
-      ItemContext,
-      { key: at, value: { index: at + 1, step } },
-      children ?? createElement(RatingItem)
-    )
-  )
+  const stars = Array.from({ length: max }, (_, at) => (
+    <ItemContext key={at} value={{ index: at + 1, step }}>
+      {children ?? <RatingItem />}
+    </ItemContext>
+  ))
   return usePart(
     control,
     "root",
@@ -92,11 +84,13 @@ function Rating({
 }
 
 function RatingRadio({ value }: { value: string }) {
-  return createElement(
-    Fragment,
-    null,
-    usePart(rating, "radio", { value }, {}, "button"),
-    usePart(rating, "input", { value }, {}, "input")
+  const radio = usePart(rating, "radio", { value }, {}, "button")
+  const input = usePart(rating, "input", { value }, {}, "input")
+  return (
+    <>
+      {radio}
+      {input}
+    </>
   )
 }
 
@@ -112,17 +106,25 @@ function RatingItem({
   if (!item) {
     throw new Error("RatingItem must be used inside <Rating>.")
   }
-  const radios = ratingItemValues(item.index, item.step).map((score) =>
-    createElement(RatingRadio, { key: score, value: String(score) })
-  )
+  const radios = ratingItemValues(item.index, item.step).map((score) => (
+    <RatingRadio key={score} value={String(score)} />
+  ))
   return usePart(
     rating,
     "item",
     { index: item.index },
     {
       ...props,
-      children: (state: RatingItemState) =>
-        createElement(Fragment, null, contentOf(children, state), radios),
+      children: (state: RatingItemState) => {
+        // Read now: JSX reads its children only when Octane renders the element.
+        const content = contentOf(children, state)
+        return (
+          <>
+            {content}
+            {radios}
+          </>
+        )
+      },
     },
     "span"
   )

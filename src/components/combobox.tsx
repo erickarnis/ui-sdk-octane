@@ -2,7 +2,8 @@
 // Ported from @ui-sdk/react's combobox (Apache-2.0, 0.1.0-beta.13).
 // `Combobox` reads its children for a `ComboboxContent` and for its items'
 // labels, so it is marked `descriptorChildren`: Octane then hands it the
-// children written in a template as elements, not as a compiled block.
+// children written in a template as elements, not as a compiled block. The
+// rest take theirs as a block, which they only render.
 import {
   combobox as comboboxPrimitive,
   type ComboboxChipProps,
@@ -29,9 +30,7 @@ import {
 import * as core from "@ui-sdk/core/renderer"
 import {
   createContext,
-  createElement,
   descriptorChildren,
-  Fragment,
   useContext,
   useId,
   useMemo,
@@ -128,33 +127,24 @@ const Combobox = descriptorChildren(function Combobox<
   useControllerEntry(options.controller, combobox)
   learnLabels(combobox.api.internal, children, itemDecorations)
   const [headerElement, setHeader] = useState<HTMLElement | null>(null)
-  const header = useMemo(
-    () => [headerElement, setHeader] as const,
-    [headerElement, setHeader]
-  )
+  const header = useMemo(() => [headerElement, setHeader] as const)
   // A data combobox renders its list, unless the app placed a ComboboxContent:
   // in the markup, or inside a component of its own.
   const found = hasChild(children, ComboboxContent)
   const [placed, place] = usePlacedContent(!!options.items && !found)
   const own = placed || found
-  return createElement(
-    HandleScope,
-    { handle: combobox },
-    createElement(
-      ContainerContext,
-      { value: container },
-      createElement(
-        SheetHeaderContext,
-        { value: header },
-        createElement(Placed, { value: place }, children),
-        createElement(
-          Placed,
-          { value: null },
-          options.items && !own ? createElement(ComboboxContent, {}) : null
-        ),
-        createElement(FormInputs, { handle: combobox })
-      )
-    )
+  return (
+    <HandleScope handle={combobox}>
+      <ContainerContext value={container}>
+        <SheetHeaderContext value={header}>
+          <Placed value={place}>{children}</Placed>
+          <Placed value={null}>
+            {options.items && !own ? <ComboboxContent /> : null}
+          </Placed>
+          <FormInputs handle={combobox} />
+        </SheetHeaderContext>
+      </ContainerContext>
+    </HandleScope>
   )
 })
 
@@ -222,15 +212,20 @@ function ComboboxContent({
   const [, setHeader] = useContext(SheetHeaderContext)
   // Reading the part's state subscribes, so items that arrive after the
   // combobox rendered still render the list. `combobox.state` doesn't subscribe.
-  const body = (state: ComboboxContentState) =>
-    createElement(
-      Fragment,
-      null,
-      sheetHeader(combobox, setHeader),
+  const body = (state: ComboboxContentState) => {
+    // Read now: JSX reads a property only when Octane renders the element.
+    const header = sheetHeader(combobox, setHeader)
+    const list =
       children !== undefined
         ? contentOf(children, state)
-        : state.items && combobox.state.items && createElement(ComboboxList, {})
+        : state.items && combobox.state.items && <ComboboxList />
+    return (
+      <>
+        {header}
+        {list}
+      </>
     )
+  }
   const element = usePart(combobox, "content", content, {
     ...props,
     children: body,
@@ -250,8 +245,9 @@ function ComboboxList({
 }
 
 // From the part's state, so new items re-render the list. Without items it's empty.
-const listItems = (state: ComboboxContentState) =>
-  createElement(ComboboxItems, { items: state.items })
+const listItems = ({ items }: ComboboxContentState) => (
+  <ComboboxItems items={items} />
+)
 
 /**
  * An option. Pressing it selects it, or toggles it with `multiple`.
@@ -335,9 +331,7 @@ type ValueIconProps = Omit<PartProps<"span">, "children">
  * while one item is selected and it has an icon.
  */
 function ComboboxValueIcon(props: ValueIconProps): OctaneNode {
-  return useNearest(comboboxPrimitive)
-    ? createElement(ComboboxValueIconPart, props)
-    : null
+  return useNearest(comboboxPrimitive) ? <ComboboxValueIconPart {...props} /> : null
 }
 
 function ComboboxValueIconPart(props: ValueIconProps): OctaneNode {
@@ -424,12 +418,12 @@ function ComboboxValue({
   children?: Content<ComboboxValueState>
 }): OctaneNode {
   // Its state, without an element.
-  const value = (_props: unknown, state: ComboboxValueState) =>
-    createElement(
-      Fragment,
-      null,
+  const value = (_props: unknown, state: ComboboxValueState) => {
+    // Read now: JSX reads a property only when Octane renders the element.
+    const shown =
       children !== undefined ? contentOf(children, state) : state.label
-    )
+    return <>{shown}</>
+  }
   return usePart(
     comboboxPrimitive,
     "value",
@@ -478,12 +472,10 @@ function ComboboxChip<T = string>({
   const combobox = useCombobox()
   combobox.instance.use(core.comboboxChips)
   const part = { id: combobox.api.internal.keyOf(value), value }
-  const chip = useMemo(() => ({ value }), [value])
-  return createElement(
-    ChipContext,
-    { value: chip },
-    usePart(combobox, "chip", part, { ...props, children })
-  )
+  const chip = useMemo(() => ({ value }))
+  // A hook, so called here: Octane builds JSX children when it renders them.
+  const element = usePart(combobox, "chip", part, { ...props, children })
+  return <ChipContext value={chip}>{element}</ChipContext>
 }
 
 /**
@@ -515,11 +507,7 @@ const ComboboxArrow = parts.Arrow
  */
 function ComboboxItems({ items }: { items: ListData<unknown> }): OctaneNode {
   const combobox = useCombobox()
-  return createElement(ListItems, {
-    items,
-    parts: listParts,
-    keyOf: combobox.api.internal.keyOf,
-  })
+  return <ListItems items={items} parts={listParts} keyOf={combobox.api.internal.keyOf} />
 }
 
 const listParts: ListParts = {

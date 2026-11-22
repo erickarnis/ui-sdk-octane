@@ -7,7 +7,7 @@ import {
   type ToolbarOptions,
   type ToolbarState,
 } from "@ui-sdk/core/toolbar"
-import { createElement, useId } from "octane"
+import { useId, type OctaneNode } from "octane"
 import {
   createParts,
   usePart,
@@ -36,17 +36,14 @@ function Toolbar({
   controller,
   debug,
   ...props
-}: ToolbarOptions & PartProps<"div", ToolbarState>) {
+}: ToolbarOptions & PartProps<"div", ToolbarState>): OctaneNode {
   const handle = usePrimitive(
     toolbar,
     defined({ orientation, loop, disabled, controller, debug })
   )
   // In its own context too, so a toggle can join a toolbar without bundling it.
-  return createElement(
-    ToolbarContext,
-    { value: handle },
-    usePart(handle, "root", {}, props)
-  )
+  const element = usePart(handle, "root", {}, props)
+  return <ToolbarContext value={handle}>{element}</ToolbarContext>
 }
 
 /**
@@ -71,14 +68,14 @@ function ToolbarGroup({
   disabled,
   children,
   ...props
-}: ToolbarGroupProps & Omit<PartProps<"div", ToolbarGroupState>, "disabled">) {
+}: ToolbarGroupProps &
+  Omit<PartProps<"div", ToolbarGroupState>, "disabled">): OctaneNode {
   // Toggles inside read whether the group is disabled from context.
-  const content = (state: ToolbarGroupState) =>
-    createElement(
-      ToolbarGroupContext,
-      { value: state.disabled },
-      contentOf(children, state)
-    )
+  const content = (state: ToolbarGroupState) => {
+    // Read now: JSX reads its children only when Octane renders the element.
+    const inner = contentOf(children, state)
+    return <ToolbarGroupContext value={state.disabled}>{inner}</ToolbarGroupContext>
+  }
   return usePart(
     toolbar,
     "group",

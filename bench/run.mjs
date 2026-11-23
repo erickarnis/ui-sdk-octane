@@ -3,7 +3,7 @@
 //
 //   pnpm bench                          every scenario, 15 runs each
 //   pnpm bench tabs select              the fixtures whose name matches
-//   pnpm bench --runs=30 --label=after  more runs; write bench/results/after.json
+//   pnpm bench --runs=30 --label=mine   more runs; write bench/results/mine.json
 //   pnpm bench --no-build               reuse the last builds
 //   pnpm bench --profile=select/open    also profile one scenario on Octane
 //   pnpm bench --profile=select/open --profile-only

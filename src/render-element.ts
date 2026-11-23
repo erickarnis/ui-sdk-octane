@@ -13,6 +13,7 @@ import {
   type ElementDescriptor,
   type Octane,
   type OctaneNode,
+  type Ref,
 } from "octane"
 
 /** What a prop may hold: each element type, not this file, says what. */
@@ -117,6 +118,16 @@ const joinStyles = (earlier: PropValue, later: PropValue) => ({
 // the element again on every render.
 const mergedRefs = new WeakMap<object, WeakMap<object, readonly unknown[]>>()
 
+/**
+ * One ref for two: either when the other is missing, or a list of both, the
+ * same list for the same pair.
+ */
+function mergeRefs<T>(
+  a: Ref<T> | undefined,
+  b: Ref<T> | undefined
+): Ref<T> | undefined
+// Refs of an unknown type, like those of a `render` element and of a part.
+function mergeRefs(a: PropValue, b: PropValue): PropValue
 function mergeRefs(a: PropValue, b: PropValue) {
   if (!isKey(a) || !isKey(b)) return a ?? b
   let inner = mergedRefs.get(a)

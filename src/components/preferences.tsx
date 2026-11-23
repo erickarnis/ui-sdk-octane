@@ -112,9 +112,7 @@ function Preferences({
       {...attributes}
       {...props}
       // A ref may be a list of refs in Octane; `mergeRefs` makes one stable list.
-      // SAFETY: `mergeRefs` returns one of the two refs or a list of both, and
-      // both are refs to this div.
-      ref={mergeRefs(element, ref ?? null) as ComponentProps<"div">["ref"]}
+      ref={mergeRefs(element, ref)}
       style={contents(style)}
       suppressHydrationWarning
     >

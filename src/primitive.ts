@@ -65,9 +65,11 @@ import {
 import {
   isKey,
   isProps,
+  mergeProp,
   mergeProps,
   mergeRefs,
   renderElement,
+  renderOwn,
   spellings,
   styleObject,
   type PropValue,
@@ -118,17 +120,21 @@ const host = {
   attaches: Object.keys(eventProps),
 } as const
 
-function toHostProps(attrs: Attrs) {
-  const props: Props = {}
-  for (const [name, value] of Object.entries(attrs)) {
+// Merges core's attributes into `props` as Octane's props.
+function mergeHostProps(props: Props, attrs: Attrs) {
+  for (const name in attrs) {
+    const value = attrs[name]
     if (value === undefined) continue
-    props[propNames[name] ?? name] = booleans.has(name)
-      ? true
-      : name === "style"
-        ? styleObject(value)
-        : value
+    mergeProp(
+      props,
+      propNames[name] ?? name,
+      booleans.has(name)
+        ? true
+        : name === "style"
+          ? styleObject(value)
+          : value
+    )
   }
-  return props
 }
 
 // A bag of props or options, whatever its type, as one the adapter can read
@@ -300,7 +306,7 @@ function slotIn(
 ) {
   const part = handle.instance.part(name, props)
   return readIn(handle, (showing) =>
-    elementProps(part, committedProps(part), user, showing)
+    elementProps(part, ownAttrs(part, committedProps(part), user, showing), user)
   )
 }
 
@@ -606,24 +612,35 @@ function heldRef(part: Part) {
 // The slot's attributes win over the app's props, but for an `id` and what
 // `yieldToAuthor` leaves to the app. The app's handlers run first and can
 // call preventDefault() to skip the built-in behavior.
-function elementProps(part: Part, props: Props, user: Props, state: object) {
-  core.takeOwnId(part, user.id)
-  const handlers: Props = {}
-  for (const [type, handler] of Object.entries(core.handlers(part))) {
+//
+// Upstream takes the part's own id and reads its attributes here. Here a
+// part's render reads them in `usePartState`, through `ownAttrs`, once for
+// its element and its snapshot, and the props are merged into one object
+// as they are read rather than from four made first.
+function elementProps(part: Part, attrs: Attrs, user: Props) {
+  const props: Props = {}
+  const handlers: Props = core.handlers(part)
+  for (const type in handlers) {
     const prop = eventProps[type]
-    if (prop) handlers[prop] = handler
+    if (prop) props[prop] = handlers[type]
   }
   // The app's props under one spelling, so `autocomplete="off"` is found
-  // where `autoComplete="off"` is.
-  const author = mergeProps(user)
-  const own = core.yieldToAuthor(
-    core.attrs(part, props, state),
-    (name) => author[propNames[name] ?? name] != null
+  // where `autoComplete="off"` is. Merged over the handlers, whose names
+  // are no attribute's.
+  for (const name in user) mergeProp(props, name, user[name])
+  mergeHostProps(
+    props,
+    core.yieldToAuthor(attrs, (name) => props[propNames[name] ?? name] != null)
   )
-  return mergeProps(handlers, author, toHostProps(own), {
-    id: user.id,
-    ref: heldRef(part),
-  })
+  mergeProp(props, "id", user.id)
+  mergeProp(props, "ref", heldRef(part))
+  return props
+}
+
+// A part's attributes once it has taken the app's id, which they may name.
+function ownAttrs(part: Part, props: Props, user: Props, state: object) {
+  core.takeOwnId(part, user.id)
+  return core.attrs(part, props, state)
 }
 
 // Attributes in `skip` may differ.
@@ -669,11 +686,16 @@ function committedProps(part: Part) {
  * read it never re-render for it. Core writes a slot's `direct` attributes to
  * the element itself, so a change to only those re-renders nothing either.
  */
+//
+// Upstream's returns the state. This one also takes the app's props, `user`,
+// and returns the part and what this render read of it with the state, so
+// `usePartElement` renders from the same reads instead of making them again.
 function usePartState(
   handle: Handle,
   name: string,
   props: Props,
-  around: Record<string, Props> | undefined
+  around: Record<string, Props> | undefined,
+  user: Props
 ) {
   const { instance } = handle
   const [, rerender] = useReducer((count: number) => count + 1, 0)
@@ -682,17 +704,24 @@ function usePartState(
   const part = instance.part(name, props, true)
   const rendered = readIn(
     handle,
-    (showing) => ({
-      handle,
-      around,
-      props,
-      snapshot: slotState(part, props, showing),
-      // The keys this render read, filled in as it reads them.
-      read: new Set<string>(),
-      attrs: core.attrs(part, props, showing),
-      present: core.present(part, props, showing),
-      version: core.renderVersion(instance),
-    }),
+    (showing) => {
+      const present = core.present(part, props, showing)
+      return {
+        handle,
+        around,
+        props,
+        snapshot: slotState(part, props, showing),
+        // The keys this render read, filled in as it reads them.
+        read: new Set<string>(),
+        // Only a part in the page takes the app's id, as upstream's
+        // `elementProps` does.
+        attrs: present
+          ? ownAttrs(part, props, user, showing)
+          : core.attrs(part, props, showing),
+        present,
+        version: core.renderVersion(instance),
+      }
+    },
     around
   )
   const state = new Proxy(rendered.snapshot, {
@@ -793,7 +822,7 @@ function usePartState(
     }
   }, [part, selected, check])
 
-  return state
+  return { part, rendered, state }
 }
 
 // A list's api, whose items' values key their parts.
@@ -934,22 +963,24 @@ function usePartElement(
         shown: { ...inside.shown, [slot]: slotProps },
       }
     : inside
-  const state = usePartState(owner, slot, slotProps, provided.shown)
-  // A part that shouldn't be in the page, like an unselected tab's panel, renders nothing.
-  const part = owner.instance.part(slot, slotProps, true)
+  // Read before the state, which takes the part's own id with its attributes.
+  const id = renderId(render)
+  const user = id === undefined ? rest : { ...rest, id }
+  const { part, rendered, state } = usePartState(
+    owner,
+    slot,
+    slotProps,
+    provided.shown,
+    user
+  )
   // The React adapter lets go of a removed part's element in a layout cleanup
   // here. Its ref does that in Octane: see `heldRef`.
-  const merged = readIn(
-    owner,
-    (showing) => {
-      if (!core.present(part, slotProps, showing)) return undefined
-      const id = renderId(render)
-      const user = id === undefined ? rest : { ...rest, id }
-      return elementProps(part, slotProps, user, showing)
-    },
-    provided.shown
-  )
-  const element = merged ? renderElement(tag, merged, render, state) : null
+  // A part that shouldn't be in the page, like an unselected tab's panel,
+  // renders nothing. The props are made for this render alone, so they
+  // resolve in place.
+  const element = rendered.present
+    ? renderOwn(tag, elementProps(part, rendered.attrs, user), render, state)
+    : null
   if (provided === scope) return element
   return createElement(context, { value: provided }, element)
 }

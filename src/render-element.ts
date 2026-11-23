@@ -177,34 +177,32 @@ const spellings: Record<string, string> = {
  */
 function mergeProps(...sources: readonly Props[]) {
   const result: Props = {}
-  for (const source of sources) {
-    for (const name in source) {
-      const value = source[name]
-      if (value === undefined) continue
-      const key = spellings[name] ?? name
-      const earlier = result[key]
-      if (earlier === undefined) {
-        result[key] = value
-      } else if (key === "className" && earlier) {
-        result[key] = combine(earlier, value, joinClasses)
-      } else if (key === "style" && earlier) {
-        result[key] = combine(earlier, value, joinStyles)
-      } else if (key === "ref" && earlier) {
-        result[key] = mergeRefs(earlier, value)
-      } else if (
-        /^on[A-Z]/.test(key) &&
-        isHandler(earlier) &&
-        isHandler(value)
-      ) {
-        result[key] = (event: Event) => {
-          if (!prevents(value, event)) earlier(event)
-        }
-      } else {
-        result[key] = value
-      }
-    }
-  }
+  for (const source of sources)
+    for (const name in source) mergeProp(result, name, source[name])
   return result
+}
+
+// Merges one prop into `result` as `mergeProps` does, for a caller that
+// builds its props in one object rather than merging several it made first.
+function mergeProp(result: Props, name: string, value: PropValue) {
+  if (value === undefined) return
+  const key = spellings[name] ?? name
+  const earlier = result[key]
+  if (earlier === undefined) {
+    result[key] = value
+  } else if (key === "className" && earlier) {
+    result[key] = combine(earlier, value, joinClasses)
+  } else if (key === "style" && earlier) {
+    result[key] = combine(earlier, value, joinStyles)
+  } else if (key === "ref" && earlier) {
+    result[key] = mergeRefs(earlier, value)
+  } else if (/^on[A-Z]/.test(key) && isHandler(earlier) && isHandler(value)) {
+    result[key] = (event: Event) => {
+      if (!prevents(value, event)) earlier(event)
+    }
+  } else {
+    result[key] = value
+  }
 }
 
 type Tag = keyof Octane.JSX.IntrinsicElements
@@ -277,8 +275,20 @@ function renderElement(
   render?: RenderProp,
   state: object = {}
 ): OctaneNode {
-  const resolved = { ...props }
-  for (const key of ["className", "style", "children"]) {
+  return renderOwn(tag, { ...props }, render, state)
+}
+
+const stateKeys = ["className", "style", "children"] as const
+
+// `renderElement` for props the caller made for this render alone, which it
+// resolves in place instead of copying.
+function renderOwn(
+  tag: string,
+  resolved: Props,
+  render: RenderProp | undefined,
+  state: object
+): OctaneNode {
+  for (const key of stateKeys) {
     const value = resolved[key]
     if (isStateFunction(value)) resolved[key] = value(state)
   }
@@ -296,9 +306,11 @@ function renderElement(
 export {
   isKey,
   isProps,
+  mergeProp,
   mergeProps,
   mergeRefs,
   renderElement,
+  renderOwn,
   spellings,
   styleObject,
   type PropValue,

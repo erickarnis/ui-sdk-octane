@@ -97,7 +97,7 @@ useLayoutEffect(() => {
 - Mirror upstream's file: the same name and extension, the same parts under the same names, the same exports, a first line saying what it is a port of. Follow "Writing Octane" above.
 - Relative imports name the `.js` file, and an exported function component states its return type (`OctaneNode`), so the published declarations resolve and stay free of React's types.
 - Add `playground/components/<name>.tsx` exporting `<Name>Page`, and `playground/components/checks/<name>.mjs`. `pnpm test:components` drives every page in a development and a production build. A component counts once its checks pass in both.
-- Check speed with `pnpm bench <fixture>` against `bench/results/baseline.json`, and add a fixture under `bench/fixtures` for a component whose cost the existing ones don't show.
+- Check speed with `pnpm bench <fixture>` against `bench/results/baseline.json`, and add a fixture under `bench/fixtures` for a component whose cost the existing ones don't show. Before optimizing `src/primitive.ts` or `src/render-element.ts`, read `bench/notes.md`: it lists what was measured, kept and dropped.
 
 ## Conformance
 

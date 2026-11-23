@@ -312,6 +312,9 @@ if (profile) {
   console.log("")
   for (const [key, ms] of [...self].sort((a, b) => b[1] - a[1]).slice(0, 30))
     console.log(`${((ms / total) * 100).toFixed(1).padStart(5)}%  ${(ms / runs).toFixed(2).padStart(7)} ms/run  ${key}`)
+  console.log("\nThis adapter's own functions:")
+  for (const [key, ms] of [...self].filter(([key]) => (key.split("  ")[1] ?? "").startsWith(process.env.OWNER ?? "src/")).sort((a, b) => b[1] - a[1]).slice(0, 15))
+    console.log(`${((ms / total) * 100).toFixed(1).padStart(5)}%  ${(ms / runs).toFixed(2).padStart(7)} ms/run  ${key}`)
   await target.page.close()
 }
 

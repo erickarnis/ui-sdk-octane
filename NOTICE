@@ -5,7 +5,7 @@ This product includes software derived from UI SDK (https://github.com/vercel-la
 Copyright 2026 Vercel, Inc., licensed under the Apache License, Version 2.0.
 
 src/primitive.ts and src/render-element.ts are ports of packages/react/src/use-primitive.tsx
-and packages/react/src/render-element.ts from @ui-sdk/react 0.1.0-beta.13, and each file in
+and packages/react/src/render-element.ts from @ui-sdk/react 0.1.0-beta.17, and each file in
 src/components is a port of the file of the same name in packages/react/src, all changed to
 run on Octane (https://github.com/octanejs/octane). The header of each file describes the
 changes.

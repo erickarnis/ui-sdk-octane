@@ -13,7 +13,8 @@ import {
   useCallback,
   useContext,
   useLayoutEffect,
-  useState,
+  useReducer,
+  useRef,
   type OctaneNode,
 } from "octane"
 import { isProps, type PropValue } from "../render-element.js"
@@ -51,15 +52,41 @@ function hasChild(children: OctaneNode, type: PropValue): boolean {
 // part tells its root when it mounts, before the page paints.
 const PlacedContext = createContext<(() => () => void) | null>(null)
 
+/**
+ * For a root that renders its own content part when the app places none:
+ * whether one is placed, and the value of the provider its children go in.
+ * Its own part goes in `<Placed value={null}>`, so it doesn't count. `wanted`
+ * is whether the root would render its own part now. Placed parts always
+ * count, so a root that gets its items later already knows about them, but
+ * only one it renders a part for renders again when they mount or leave.
+ */
 function usePlacedContent(wanted: boolean) {
-  const [count, setCount] = useState(0)
+  const placed = useRef(0)
+  const rendersOwn = useRef(wanted)
+  const [, rerender] = useReducer((count: number) => count + 1, 0)
+  const seen = placed.current > 0
+  // Children's effects run first, so this sees parts placed or removed in the
+  // same commit, whose own calls still read the last commit's `rendersOwn`.
+  // `null` runs it after every render, as React's effect without dependencies does.
+  useLayoutEffect(() => {
+    rendersOwn.current = wanted
+    if (wanted && placed.current > 0 !== seen) {
+      rerender()
+    }
+  }, null)
   const register = useCallback(() => {
-    setCount((count) => count + 1)
+    placed.current += 1
+    if (rendersOwn.current) {
+      rerender()
+    }
     return () => {
-      setCount((count) => count - 1)
+      placed.current -= 1
+      if (rendersOwn.current && !placed.current) {
+        rerender()
+      }
     }
   }, [])
-  return [count > 0, wanted ? register : null] as const
+  return [seen, register] as const
 }
 
 // A context is its own provider in Octane.

@@ -15,17 +15,17 @@ Install the adapter with the two packages it expects you to provide. Pin
 
 ```sh
 pnpm add ui-sdk-octane octane
-pnpm add --save-exact @ui-sdk/core@0.1.0-beta.13
+pnpm add --save-exact @ui-sdk/core@0.1.0-beta.17
 ```
 
 ```sh
 npm install ui-sdk-octane octane
-npm install --save-exact @ui-sdk/core@0.1.0-beta.13
+npm install --save-exact @ui-sdk/core@0.1.0-beta.17
 ```
 
 ```sh
 bun add ui-sdk-octane octane
-bun add --exact @ui-sdk/core@0.1.0-beta.13
+bun add --exact @ui-sdk/core@0.1.0-beta.17
 ```
 
 `ui-sdk-octane` must be in your project's own `dependencies` or
@@ -33,7 +33,7 @@ bun add --exact @ui-sdk/core@0.1.0-beta.13
 that only arrives through another package is not compiled.
 
 Octane's compiler also needs the `@tsrx/oxc` version its release names as a peer
-(`0.24.0` for Octane 0.23). That is part of setting up
+(`0.24.0` for Octane 0.25). That is part of setting up
 Octane, not of this package; `npm view octane@<version> peerDependencies` prints
 it.
 
@@ -121,11 +121,11 @@ not apply to its source. They resolve with `"moduleResolution": "bundler"`,
 
 | ui-sdk-octane | `@ui-sdk/core`           | Octane                            | Node         |
 | ------------- | ------------------------ | --------------------------------- | ------------ |
-| 0.0.1         | `0.1.0-beta.13`, exactly | `>=0.23.1 <0.24.0` (0.23.1)        | `>=22.22.2`  |
+| 0.0.1         | `0.1.0-beta.17`, exactly | `>=0.25.0 <0.26.0` (0.25.0)        | `>=22.22.2`  |
 
 Each release supports the newest Octane at the time and is written for it: the
 components use what that release offers (see "Writing Octane" in AGENTS.md for
-which feature needs which version). 0.23.1 was checked from a packed tarball, in
+which feature needs which version). 0.25.0 was checked from a packed tarball, in
 a Vite project and an Astro project, in development and from a production build
 (`pnpm test:pack`). The Astro project used the `@octanejs/astro` release that
 names that Octane version, with Astro 7 and Vite 8, and mounts the app both in
@@ -134,7 +134,7 @@ hydrated (`client:load`).
 
 The range stops at the newest version checked. Octane releases a minor version
 every few days, and an older, unrelated package named `octane` holds versions
-1.0.0 to 1.0.3 on npm, so an open range such as `>=0.23.1` would also accept
+1.0.0 to 1.0.3 on npm, so an open range such as `>=0.25.0` would also accept
 those. On a newer Octane your package manager reports the unmet peer; npm may
 refuse the install until you pass `--legacy-peer-deps`. A weekly CI job runs
 the same check on the newest Octane; when it passes, the next release raises
@@ -147,7 +147,7 @@ and may change in any release, betas included. So each release of this package
 names one core version, as an exact peer dependency:
 
 - Install exactly that version, and use it for your own imports such as
-  `@ui-sdk/core/tabs`. A range like `^0.1.0-beta.13` would move to the next beta.
+  `@ui-sdk/core/tabs`. A range like `^0.1.0-beta.17` would move to the next beta.
 - To move to a newer core, wait for the release of this package that names it,
   and upgrade the two together.
 - The adapter and your code must load one copy of core. Core keeps its state in
@@ -176,5 +176,5 @@ names one core version, as an exact peer dependency:
 ```sh
 pnpm check:package   # publint and attw on the packed tarball
 pnpm test:pack       # install the tarball into fixtures/consumer-* and drive a browser
-pnpm test:pack --octane=0.23.1 --consumer=astro --pm=bun --keep
+pnpm test:pack --octane=0.25.0 --consumer=astro --pm=bun --keep
 ```

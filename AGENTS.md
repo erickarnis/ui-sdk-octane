@@ -1,10 +1,10 @@
 # ui-sdk-octane
 
-An unofficial Octane adapter for UI SDK (`@ui-sdk/core`, Vercel Labs, beta). `src/primitive.ts` is a port of `@ui-sdk/react`'s `use-primitive.tsx` (0.1.0-beta.13) and `src/render-element.ts` of its `render-element.ts`. The public entries are `ui-sdk-octane/primitive` (`createParts`, `usePrimitive`, `usePart`, `mergeProps`, `renderElement`) and one per component, as in `@ui-sdk/react` (`ui-sdk-octane/tabs`). Each file in `src/components` is a port of the file of the same name in upstream's `packages/react/src`; `src/internal.ts` holds what those files use beyond the public entry.
+An unofficial Octane adapter for UI SDK (`@ui-sdk/core`, Vercel Labs, beta). `src/primitive.ts` is a port of `@ui-sdk/react`'s `use-primitive.tsx` (0.1.0-beta.17) and `src/render-element.ts` of its `render-element.ts`. The public entries are `ui-sdk-octane/primitive` (`createParts`, `usePrimitive`, `usePart`, `mergeProps`, `renderElement`) and one per component, as in `@ui-sdk/react` (`ui-sdk-octane/tabs`). Each file in `src/components` is a port of the file of the same name in upstream's `packages/react/src`; `src/internal.ts` holds what those files use beyond the public entry.
 
 ## Writing Octane
 
-The package targets the newest Octane (0.23.1; the peer range has one minor). What follows was settled from Octane's docs (`differences-from-react.md`, `tsrx-basics.md`, `signals.md`), from what `compile` in `octane/compiler` makes of each style, from Octane's own ports, and from `pnpm bench`. Read `docs/differences-from-react.md` in the Octane repository before changing hooks.
+The package targets the newest Octane (0.25.0; the peer range has one minor). What follows was settled from Octane's docs (`differences-from-react.md`, `tsrx-basics.md`, `signals.md`), from what `compile` in `octane/compiler` makes of each style, from Octane's own ports, and from `pnpm bench`. Read `docs/differences-from-react.md` in the Octane repository before changing hooks.
 
 ### Files
 

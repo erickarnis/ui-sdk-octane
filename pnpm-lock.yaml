@@ -18,8 +18,8 @@ importers:
         specifier: ^0.33.0
         version: 0.33.0
       '@octanejs/base-ui':
-        specifier: 0.1.77
-        version: 0.1.77(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
+        specifier: 0.1.79
+        version: 0.1.79(octane@0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
       '@playwright/test':
         specifier: 1.63.0
         version: 1.63.0
@@ -39,14 +39,14 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
       '@ui-sdk/core':
-        specifier: 0.1.0-beta.13
-        version: 0.1.0-beta.13
+        specifier: 0.1.0-beta.17
+        version: 0.1.0-beta.17
       '@ui-sdk/react':
-        specifier: 0.1.0-beta.13
-        version: 0.1.0-beta.13(@types/react@19.3.0)(@ui-sdk/core@0.1.0-beta.13)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 0.1.0-beta.17
+        version: 0.1.0-beta.17(@types/react@19.3.0)(@ui-sdk/core@0.1.0-beta.17)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       octane:
-        specifier: 0.23.1
-        version: 0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+        specifier: 0.25.0
+        version: 0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
       playwright:
         specifier: 1.63.0
         version: 1.63.0
@@ -160,20 +160,20 @@ packages:
     resolution: {integrity: sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==}
     engines: {node: '>= 20.19.0'}
 
-  '@octanejs/base-ui-utils@0.1.25':
-    resolution: {integrity: sha512-zbKUijzAYG4Cwx5+ZmdJXYzBCJHEozh5Cl9sjc2hsWwayNzD9zbhQAw/BNcnLbe9220PQjDZufxnATQoAEV84Q==}
+  '@octanejs/base-ui-utils@0.1.27':
+    resolution: {integrity: sha512-CoOy6OfLK0XOlsxCv8aMnFHI4oWu++2vwyDKfgiwLcpoGSY7eaOETaJ9+j1afCuWhE0CaPYupJRvEh0i/3B7wQ==}
     engines: {node: '>=22.22.2'}
     peerDependencies:
-      octane: ^0.23.0
+      octane: ^0.25.0
 
-  '@octanejs/base-ui@0.1.77':
-    resolution: {integrity: sha512-S09bJZ/ffJK1r6R16Il8aZdrt1doPNKg9/+wlw1P4b731LF4dFQCnUss5iG1bsjH7Ez3nysKp+eOxZg94QC/TA==}
+  '@octanejs/base-ui@0.1.79':
+    resolution: {integrity: sha512-/L+RJ3Xo8K79zHZsclEU/fLeJE3aq/35Kx2sbQKTXZNZbgWAOUvF+doMutyUnvJ801xsCVZcneAatQoOdLaMqA==}
     engines: {node: '>=22.22.2'}
     peerDependencies:
       '@date-fns/tz': ^1.2.0
       date-fns: ^4.0.0
       luxon: ^3.7.2
-      octane: ^0.23.0
+      octane: ^0.25.0
     peerDependenciesMeta:
       '@date-fns/tz':
         optional: true
@@ -182,11 +182,11 @@ packages:
       luxon:
         optional: true
 
-  '@octanejs/floating-ui@0.1.76':
-    resolution: {integrity: sha512-idBMjz205EO3eGJnsmIyUP0yYJ0njeqjP2NOxxoWINLoqcKDJ51dMlS7Ae2xPNeON0sxOL8rzMPmion0vVwogA==}
+  '@octanejs/floating-ui@0.1.78':
+    resolution: {integrity: sha512-0EXXukN0aGo17rnXX8smvUQ+9yIWm+C/qS5ITug8Q6Zkx4THR2qUmi/OVV6+RJK65bBe+G10LqhLRXbFqNjrdg==}
     engines: {node: '>=22.22.2'}
     peerDependencies:
-      octane: ^0.23.0
+      octane: ^0.25.0
 
   '@oxc-project/types@0.150.0':
     resolution: {integrity: sha512-rDS5/31E9HfPl/CIzGrn0DOlvBbXFseQ5URJ9sYMfstbKLD/c6Gm9vmRzRGDdAXyOIL4zmO37lc9RIwYqVruZw==}
@@ -749,14 +749,14 @@ packages:
   '@types/react@19.3.0':
     resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
 
-  '@ui-sdk/core@0.1.0-beta.13':
-    resolution: {integrity: sha512-URjk9hqdc/cZKDtw6Gb9NqjY48U8l0EgoP4d5ghlooa3av+GrR0iSmsav133UU4oelcuKIO1ZPJ4j7gIPMr1Vg==}
+  '@ui-sdk/core@0.1.0-beta.17':
+    resolution: {integrity: sha512-wBWNqT0Qf1sE6fqD1XuBnSGBFcY6+cek1z7rKl/r4j2bsv2or9i7z44PLy0J9hmflm3IJ5MLW0P4ur2H9BCIvg==}
 
-  '@ui-sdk/react@0.1.0-beta.13':
-    resolution: {integrity: sha512-Gz85tAcPJHwnv90WMIAtED3fDamqVD3F3FF3uKsA/TsL+KbaeHSgX1gGdIpNcnzkmDO8YZk9aZBKgCFgpaCcHA==}
+  '@ui-sdk/react@0.1.0-beta.17':
+    resolution: {integrity: sha512-oAJu+/e8woA5gboO28nm3aiO2qZbjccGc8hukCijSz3biX71AYBw8mo14HkMAZUuPlbSnzVAuNYQMaW0z8vsrw==}
     peerDependencies:
       '@types/react': '>=19.2.10'
-      '@ui-sdk/core': ^0.1.0-beta.13
+      '@ui-sdk/core': ^0.1.0-beta.17
       react: '>=19'
       react-dom: '>=19'
     peerDependenciesMeta:
@@ -1059,8 +1059,8 @@ packages:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
 
-  octane@0.23.1:
-    resolution: {integrity: sha512-XstuG9R7WfBGlfY8ubM+8GsmL8fSFi2qXDy9v5WJyVM+7SOsfrSD2LYBMvQXfuMS87O6+kr9wFH48rl9DZP3WA==}
+  octane@0.25.0:
+    resolution: {integrity: sha512-0OJQI8eem3DUYLHvBazsTodLKY7xS38P5CKAUcG2lsfAmCaNISDSYCd+FdHnlBeh5kWvcl7JuBtS3B0/u6K7KQ==}
     engines: {node: '>=22.22.2'}
     peerDependencies:
       '@tsrx/oxc': 0.24.0
@@ -1450,24 +1450,24 @@ snapshots:
 
   '@noble/hashes@2.4.0': {}
 
-  '@octanejs/base-ui-utils@0.1.25(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
+  '@octanejs/base-ui-utils@0.1.27(octane@0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
     dependencies:
       '@floating-ui/utils': 0.2.12
-      octane: 0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+      octane: 0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
       reselect: 5.3.0
 
-  '@octanejs/base-ui@0.1.77(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
+  '@octanejs/base-ui@0.1.79(octane@0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
     dependencies:
       '@floating-ui/utils': 0.2.12
-      '@octanejs/base-ui-utils': 0.1.25(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
-      '@octanejs/floating-ui': 0.1.76(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
-      octane: 0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+      '@octanejs/base-ui-utils': 0.1.27(octane@0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
+      '@octanejs/floating-ui': 0.1.78(octane@0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))
+      octane: 0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
 
-  '@octanejs/floating-ui@0.1.76(octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
+  '@octanejs/floating-ui@0.1.78(octane@0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))':
     dependencies:
       '@floating-ui/dom': 1.8.0
       '@floating-ui/utils': 0.2.12
-      octane: 0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+      octane: 0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
       tabbable: 6.5.2
 
   '@oxc-project/types@0.150.0': {}
@@ -1845,11 +1845,11 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
-  '@ui-sdk/core@0.1.0-beta.13': {}
+  '@ui-sdk/core@0.1.0-beta.17': {}
 
-  '@ui-sdk/react@0.1.0-beta.13(@types/react@19.3.0)(@ui-sdk/core@0.1.0-beta.13)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@ui-sdk/react@0.1.0-beta.17(@types/react@19.3.0)(@ui-sdk/core@0.1.0-beta.17)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@ui-sdk/core': 0.1.0-beta.13
+      '@ui-sdk/core': 0.1.0-beta.17
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
     optionalDependencies:
@@ -2084,10 +2084,11 @@ snapshots:
 
   object-assign@4.1.1: {}
 
-  octane@0.23.1(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)):
+  octane@0.25.0(@tsrx/oxc@0.24.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)):
     dependencies:
       '@tsrx/core': 0.6.9
       '@types/react': 19.3.0
+      '@types/react-dom': 19.3.0(@types/react@19.3.0)
       '@volar/language-core': 2.4.28
       '@volar/typescript': 2.4.28
       csstype: 3.2.3

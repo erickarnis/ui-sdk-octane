@@ -1,8 +1,8 @@
 {
-  "base › tree.a11y.spec.ts › no axe violations with checkboxes": "Fails on @ui-sdk/react 0.1.0-beta.13 too.",
-  "base › tree.a11y.spec.ts › no axe violations with nested branches expanded and an item selected": "Fails on @ui-sdk/react 0.1.0-beta.13 too.",
-  "data › tree.a11y.spec.ts › no axe violations with checkboxes": "Fails on @ui-sdk/react 0.1.0-beta.13 too.",
-  "data › tree.a11y.spec.ts › no axe violations with nested branches expanded and an item selected": "Fails on @ui-sdk/react 0.1.0-beta.13 too.",
-  "ssr › tree.a11y.spec.ts › no axe violations with checkboxes": "Fails on @ui-sdk/react 0.1.0-beta.13 too.",
-  "ssr › tree.a11y.spec.ts › no axe violations with nested branches expanded and an item selected": "Fails on @ui-sdk/react 0.1.0-beta.13 too."
+  "base › tree.a11y.spec.ts › no axe violations with checkboxes": "Fails on @ui-sdk/react 0.1.0-beta.17 too.",
+  "base › tree.a11y.spec.ts › no axe violations with nested branches expanded and an item selected": "Fails on @ui-sdk/react 0.1.0-beta.17 too.",
+  "data › tree.a11y.spec.ts › no axe violations with checkboxes": "Fails on @ui-sdk/react 0.1.0-beta.17 too.",
+  "data › tree.a11y.spec.ts › no axe violations with nested branches expanded and an item selected": "Fails on @ui-sdk/react 0.1.0-beta.17 too.",
+  "ssr › tree.a11y.spec.ts › no axe violations with checkboxes": "Fails on @ui-sdk/react 0.1.0-beta.17 too.",
+  "ssr › tree.a11y.spec.ts › no axe violations with nested branches expanded and an item selected": "Fails on @ui-sdk/react 0.1.0-beta.17 too."
 }

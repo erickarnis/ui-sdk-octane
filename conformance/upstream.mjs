@@ -8,8 +8,8 @@ import { execFileSync } from "node:child_process"
 import { existsSync, mkdirSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 
-/** "chore: version packages (beta) (#893)", which published 0.1.0-beta.13. */
-export const commit = "f01f1739644ce83a0ba09fafc591d4050a2bbe83"
+/** "chore: version packages (beta) (#1049)", which published 0.1.0-beta.17. */
+export const commit = "d850982bd8aed202e07009825c3d9daf643fa24e"
 export const upstream = fileURLToPath(new URL("../.upstream/", import.meta.url))
 
 const git = (...args) =>

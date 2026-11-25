@@ -4,7 +4,7 @@
 // version asked for.
 //
 //   pnpm test:pack
-//   pnpm test:pack --octane=0.23.1 --consumer=astro --pm=bun --keep
+//   pnpm test:pack --octane=0.25.0 --consumer=astro --pm=bun --keep
 //
 // --octane    Octane versions, comma separated      (OCTANE_VERSIONS, default below)
 // --consumer  vite, astro or both                   (default both)
@@ -23,7 +23,7 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { drive } from "./drive.mjs"
 
-const DEFAULT_OCTANE = "0.23.1"
+const DEFAULT_OCTANE = "0.25.0"
 const here = path.dirname(fileURLToPath(import.meta.url))
 const repo = path.dirname(here)
 

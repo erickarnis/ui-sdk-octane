@@ -146,7 +146,7 @@ if (update) {
   const reason = (key) =>
     known[key] ??
     (onReact(key) === "failed"
-      ? "Fails on @ui-sdk/react 0.1.0-beta.13 too."
+      ? "Fails on @ui-sdk/react 0.1.0-beta.17 too."
       : "Unexplained.")
   const next = Object.fromEntries(
     [

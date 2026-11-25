@@ -9,8 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ui-sdk/core": "0.1.0-beta.13",
-    "octane": "0.23.1",
+    "@ui-sdk/core": "0.1.0-beta.17",
+    "octane": "0.25.0",
     "ui-sdk-octane": "file:./ui-sdk-octane.tgz"
   },
   "devDependencies": {

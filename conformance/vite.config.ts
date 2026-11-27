@@ -89,6 +89,10 @@ function reactFixturesAsOctane(): Plugin {
         )
         // React's onChange on a text field is the browser's input event.
         .replace(/\bonChange=/g, "onInput=")
+        // The same, as a key of props spread onto a field (trigger-menu's
+        // controlled field). Only a handler of an event: toast's shell has
+        // an onChange of its own.
+        .replace(/\bonChange:(\s*\(event\b)/g, "onInput:$1")
         // An Octane context is its own provider.
         .replace(/<(\/?)([A-Za-z.]+)\.Provider\b/g, "<$1$2")
       // Octane has no <Profiler>: see app/profiler.ts.
